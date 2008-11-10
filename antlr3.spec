@@ -3,11 +3,12 @@
 Summary: ANother Tool for Language Recognition
 Name: antlr3
 Version: 3.1.1
-Release: 2%{?dist}
+Release: 3%{?dist}
 URL: http://www.antlr.org/
 Source0: http://www.antlr.org/download/antlr-3.1.1.tar.gz
 # Utility file, in conversation with upstream about this
 Source1: antlr-clean-generated
+Source2: antlr3
 License: BSD
 Group: Development/Libraries
 BuildArch: noarch
@@ -18,6 +19,8 @@ BuildRequires: python
 BuildRequires: ant, stringtemplate, ant-antlr, ant-junit
 BuildRequires: jpackage-utils
 Requires: jpackage-utils
+Requires: antlr
+Requires: stringtemplate
 
 %description
 ANother Tool for Language Recognition, is a language tool
@@ -53,7 +56,8 @@ cd ../..
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -D build/antlr.jar $RPM_BUILD_ROOT%{_datadir}/java/antlr3.jar
+install -D build/antlr-3.1.1.jar $RPM_BUILD_ROOT%{_datadir}/java/antlr3.jar
+install -D -m 0755 %{SOURCE2} $RPM_BUILD_ROOT%{_bindir}/antlr3
 
 cd runtime/Python
 %{__python} setup.py install -O1 --skip-build --root %{buildroot}
@@ -66,6 +70,7 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 %doc README.txt LICENSE.txt
 %{_datadir}/java/*.jar
+%{_bindir}/antlr3
 
 %files python
 %defattr(0644,root,root,0755)
@@ -73,6 +78,9 @@ rm -rf $RPM_BUILD_ROOT
 %{python_sitelib}/antlr_python_runtime-*
 
 %changelog
+* Mon Nov 10 2008 Colin Walters <walters@redhat.com> - 3.1.1-3
+- Add antlr3 script
+
 * Mon Nov  6 2008 Bart Vanbrabant <bart.vanbrabant@zoeloelip.be> - 3.1.1-2
 - Fix the install of the jar (remove the version)
 
