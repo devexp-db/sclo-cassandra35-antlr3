@@ -3,7 +3,7 @@
 Summary: ANother Tool for Language Recognition
 Name: antlr3
 Version: 3.1.1
-Release: 3%{?dist}
+Release: 4%{?dist}
 URL: http://www.antlr.org/
 Source0: http://www.antlr.org/download/antlr-3.1.1.tar.gz
 # Utility file, in conversation with upstream about this
@@ -17,6 +17,8 @@ BuildRequires: java-devel >= 1:1.6.0
 # For cleaner script
 BuildRequires: python
 BuildRequires: ant, stringtemplate, ant-antlr, ant-junit
+# The build.xml uses this to version the jar
+BuildRequires: bcel
 BuildRequires: jpackage-utils
 Requires: jpackage-utils
 Requires: antlr
@@ -78,6 +80,9 @@ rm -rf $RPM_BUILD_ROOT
 %{python_sitelib}/antlr_python_runtime-*
 
 %changelog
+* Mon Jan 12 2009 Colin Walters <walters@redhat.com> - 3.1.1-4
+- Add bcel build dep to version jar name
+
 * Mon Nov 10 2008 Colin Walters <walters@redhat.com> - 3.1.1-3
 - Add antlr3 script
 
