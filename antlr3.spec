@@ -3,7 +3,7 @@
 Summary: ANother Tool for Language Recognition
 Name: antlr3
 Version: 3.1.1
-Release: 4%{?dist}
+Release: 5%{?dist}
 URL: http://www.antlr.org/
 Source0: http://www.antlr.org/download/antlr-3.1.1.tar.gz
 # Utility file, in conversation with upstream about this
@@ -45,7 +45,7 @@ Python runtime support for ANTLR-generated parsers
 
 %build
 rm -f lib/*.jar
-build-jar-repository -s -p lib stringtemplate
+build-jar-repository -s -p lib stringtemplate bcel
 # Clean out generated files upstream includes
 %{__python} %{SOURCE1} .
 # Build
@@ -80,6 +80,9 @@ rm -rf $RPM_BUILD_ROOT
 %{python_sitelib}/antlr_python_runtime-*
 
 %changelog
+* Mon Jan 12 2009 Colin Walters <walters@redhat.com> - 3.1.1-5
+- Add bcel to build path
+
 * Mon Jan 12 2009 Colin Walters <walters@redhat.com> - 3.1.1-4
 - Add bcel build dep to version jar name
 
