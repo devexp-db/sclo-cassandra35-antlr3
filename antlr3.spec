@@ -3,7 +3,7 @@
 Summary: ANother Tool for Language Recognition
 Name: antlr3
 Version: 3.1.1
-Release: 5%{?dist}
+Release: 6%{?dist}
 URL: http://www.antlr.org/
 Source0: http://www.antlr.org/download/antlr-3.1.1.tar.gz
 # Utility file, in conversation with upstream about this
@@ -80,6 +80,9 @@ rm -rf $RPM_BUILD_ROOT
 %{python_sitelib}/antlr_python_runtime-*
 
 %changelog
+* Mon Feb 23 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 3.1.1-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_11_Mass_Rebuild
+
 * Mon Jan 12 2009 Colin Walters <walters@redhat.com> - 3.1.1-5
 - Add bcel to build path
 
