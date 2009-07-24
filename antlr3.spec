@@ -3,7 +3,7 @@
 Summary: ANother Tool for Language Recognition
 Name: antlr3
 Version: 3.1.1
-Release: 7%{?dist}
+Release: 8%{?dist}
 URL: http://www.antlr.org/
 Source0: http://www.antlr.org/download/antlr-3.1.1.tar.gz
 # Utility file, in conversation with upstream about this
@@ -80,6 +80,9 @@ rm -rf $RPM_BUILD_ROOT
 %{python_sitelib}/antlr_python_runtime-*
 
 %changelog
+* Fri Jul 24 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 3.1.1-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_12_Mass_Rebuild
+
 * Mon Mar 17 2009 Bart Vanbrabant <bart.vanbrabant@zoeloelip.be> - 3.1.1-7
 - Fix the name of the jar to antlr.jar
 
