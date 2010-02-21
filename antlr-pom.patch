@@ -1,0 +1,94 @@
+--- gunit/pom.xml.orig	2010-01-29 02:12:43.000000000 +0100
++++ gunit/pom.xml	2010-01-29 02:12:54.000000000 +0100
+@@ -142,16 +142,6 @@
+                 <artifactId>maven-surefire-plugin</artifactId>
+             </plugin>
+ 
+-            <plugin>
+-                <groupId>org.codehaus.mojo</groupId>
+-                <artifactId>findbugs-maven-plugin</artifactId>
+-                <configuration>
+-                    <findbugsXmlOutput>true</findbugsXmlOutput>
+-                    <findbugsXmlWithMessages>true</findbugsXmlWithMessages>
+-                    <xmlOutput>true</xmlOutput>
+-                </configuration>
+-            </plugin>
+-
+         </plugins>
+ 
+         <extensions>
+--- runtime/Java/pom.xml.orig	2010-01-29 02:13:13.000000000 +0100
++++ runtime/Java/pom.xml	2010-01-29 02:13:21.000000000 +0100
+@@ -104,15 +104,6 @@
+             </configuration>
+         </plugin>
+ 
+-        <plugin>
+-            <groupId>org.codehaus.mojo</groupId>
+-            <artifactId>findbugs-maven-plugin</artifactId>
+-            <configuration>
+-                <findbugsXmlOutput>true</findbugsXmlOutput>
+-                <findbugsXmlWithMessages>true</findbugsXmlWithMessages>
+-                <xmlOutput>true</xmlOutput>
+-            </configuration>
+-        </plugin>
+     </plugins>
+ </build>
+ 
+--- tool/pom.xml.orig	2009-09-23 20:50:28.000000000 +0200
++++ tool/pom.xml	2010-02-01 13:01:08.000000000 +0100
+@@ -75,8 +82,7 @@
+             </plugin>
+             
+             <plugin>
+-                <groupId>org.codehaus.mojo</groupId>
+-                <artifactId>antlr-maven-plugin</artifactId>
++                <artifactId>maven-antlr-plugin</artifactId>
+                 <configuration>
+                     <sourceDirectory>src/main/antlr2/org/antlr/grammar/v2</sourceDirectory>
+                     <grammars>antlr.g codegen.g, antlr.print.g, assign.types.g, buildnfa.g, define.g</grammars>
+--- pom.xml.orig	2009-09-23 20:46:18.000000000 +0200
++++ pom.xml	2010-02-01 13:45:20.000000000 +0100
+@@ -146,25 +154,6 @@
+         
+         <plugins>
+ 
+-             <plugin>
+-                <groupId>org.codehaus.mojo</groupId>
+-                <artifactId>buildnumber-maven-plugin</artifactId>
+-                <configuration>
+-                  <format>{0,date,MMM dd, yyyy} {0,time,kk:mm:ss}</format>
+-                  <items>
+-                    <item>timestamp</item>
+-                  </items>
+-                </configuration>
+-                <executions>
+-                  <execution>
+-                    <phase>validate</phase>
+-                    <goals>
+-                      <goal>create</goal>
+-                    </goals>
+-                  </execution>
+-                </executions>
+-             </plugin>
+-
+             <plugin>
+                 <artifactId>maven-compiler-plugin</artifactId>
+                 <configuration>
+@@ -179,16 +168,6 @@
+             </plugin>
+ 
+             <plugin>
+-                <groupId>org.codehaus.mojo</groupId>
+-                <artifactId>findbugs-maven-plugin</artifactId>
+-                <configuration>
+-                    <findbugsXmlOutput>true</findbugsXmlOutput>
+-                    <findbugsXmlWithMessages>true</findbugsXmlWithMessages>
+-                    <xmlOutput>true</xmlOutput>
+-                </configuration>
+-            </plugin>
+-
+-            <plugin>
+ 
+                 <!--
+ 
