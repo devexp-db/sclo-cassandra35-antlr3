@@ -1,6 +1,6 @@
 %{!?python_sitelib: %global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")}
 
-%global with_bootstrap 1
+%global with_bootstrap 0
 
 %global antlr_version 3.2
 %global python_runtime_version 3.1.2
@@ -9,7 +9,7 @@
 Summary:			ANother Tool for Language Recognition
 Name:				antlr3
 Version:			%{antlr_version}
-Release:			2%{?dist}
+Release:			3%{?dist}
 URL:				http://www.antlr.org/
 Source0:			http://www.antlr.org/download/antlr-%{antlr_version}.tar.gz
 Source1:			http://www.antlr.org/download/C/libantlr3c-%{antlr_version}.tar.gz
@@ -295,6 +295,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_mavenpomdir}/JPP-maven-gunit-plugin.pom
 
 %changelog
+* Tue Mar 02 2010 Miloš Jakubíček <xjakub@fi.muni.cz> - 3.2-3
+- Rebuilt in non-bootstrap mode.
+
 * Sun Jan 31 2010 Milos Jakubicek <xjakub@fi.muni.cz> - 3.2-2
 - Build the doxygen documentation for the C target in a C-docs subpackage
 - BuildRequires/Requires cleanup across subpackages
