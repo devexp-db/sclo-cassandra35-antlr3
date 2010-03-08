@@ -9,7 +9,7 @@
 Summary:			ANother Tool for Language Recognition
 Name:				antlr3
 Version:			%{antlr_version}
-Release:			3%{?dist}
+Release:			4%{?dist}
 URL:				http://www.antlr.org/
 Source0:			http://www.antlr.org/download/antlr-%{antlr_version}.tar.gz
 Source1:			http://www.antlr.org/download/C/libantlr3c-%{antlr_version}.tar.gz
@@ -29,6 +29,7 @@ BuildRoot:			%{_tmppath}/%{name}-%{antlr_version}-%{release}-root-%(%{__id_u} -n
 BuildRequires:		java-devel >= 1:1.6.0
 BuildRequires:		jpackage-utils
 BuildRequires:		maven2
+BuildRequires:		maven-plugin-bundle
 BuildRequires:		maven2-plugin-resources
 BuildRequires:		maven2-plugin-compiler
 BuildRequires:		maven2-plugin-jar
@@ -109,6 +110,14 @@ Summary:		C run-time support for ANTLR-generated parsers
 
 %description	C
 C run-time support for ANTLR-generated parsers
+
+%package		C-devel
+Group:			Development/Libraries
+Summary:		Header files for the C bindings for ANTLR-generated parsers
+Requires:		%{name}-C = %{antlr_version}-%{release}
+
+%description	C-devel
+Header files for the C bindings for ANTLR-generated parsers
 
 %package		C-docs
 Group:			Documentation
@@ -228,7 +237,12 @@ popd
 pushd libantlr3c-%{antlr_version}
 make DESTDIR=$RPM_BUILD_ROOT install
 rm $RPM_BUILD_ROOT%{_libdir}/libantlr3c.{a,la}
-gzip api/man/man3/*
+pushd api/man/man3
+for file in `ls -1 * | grep -vi "^antlr3"`; do
+	mv $file antlr3-$file
+done
+gzip *
+popd
 mv api/man/man3 $RPM_BUILD_ROOT%{_mandir}/
 rmdir api/man
 popd
@@ -260,7 +274,9 @@ rm -rf $RPM_BUILD_ROOT
 %files tool
 %defattr(-,root,root,-)
 %doc tool/{README.txt,LICENSE.txt,CHANGES.txt}
-%{_javadir}/*.jar
+%{_javadir}/antlr3.jar
+%{_javadir}/antlr3-maven*.jar
+%{_javadir}/antlr-%{antlr_version}.jar
 %{_bindir}/antlr3
 %{_mavenpomdir}/JPP-antlr3-maven-plugin.pom
 %{_mavenpomdir}/JPP-antlr.pom
@@ -273,8 +289,11 @@ rm -rf $RPM_BUILD_ROOT
 
 %files C
 %defattr(-,root,root,-)
+%{_libdir}/libantlr3c.so
+
+%files C-devel
+%defattr(-,root,root,-)
 %{_includedir}/antlr3*
-%{_libdir}/*
 %{_mandir}/man3/*
 
 %files C-docs
@@ -283,7 +302,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files java
 %defattr(-,root,root,-)
-%{_javadir}/antlr-runtime-%{antlr_version}.jar
+%{_javadir}/*runtime*.jar
 
 %files javascript
 %defattr(-,root,root,-)
@@ -295,6 +314,14 @@ rm -rf $RPM_BUILD_ROOT
 %{_mavenpomdir}/JPP-maven-gunit-plugin.pom
 
 %changelog
+* Mon Mar 08 2010 Miloš Jakubíček <xjakub@fi.muni.cz> - 3.2-4
+- Patch Java runtime build to include OSGi meta-information in the manifest
+  (thanks to Mat Booth)
+- Add "antlr3" prefix to all man pages to prevent namespace conflicts with
+  standard man pages included in the man-pages package
+- Split headers and man pages into a C-devel subpackage
+- Fix multiple file ownership of Java runtime and gunit by the tool package
+
 * Tue Mar 02 2010 Miloš Jakubíček <xjakub@fi.muni.cz> - 3.2-3
 - Rebuilt in non-bootstrap mode.
 
