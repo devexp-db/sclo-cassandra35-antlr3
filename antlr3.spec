@@ -196,10 +196,10 @@ popd
 # Build the C runtime
 pushd libantlr3c-%{antlr_version}
 
-%ifarch x86_64
+%ifarch x86_64 ppc64
 %configure --disable-abiflags --enable-debuginfo --enable-64bit
 %endif
-%ifarch %{ix86}
+%ifarch %{ix86} ppc
 %configure --disable-abiflags --enable-debuginfo
 %endif
 
