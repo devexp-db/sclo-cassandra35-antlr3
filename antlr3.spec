@@ -9,7 +9,7 @@
 Summary:			ANother Tool for Language Recognition
 Name:				antlr3
 Version:			%{antlr_version}
-Release:			4%{?dist}
+Release:			5%{?dist}
 URL:				http://www.antlr.org/
 Source0:			http://www.antlr.org/download/antlr-%{antlr_version}.tar.gz
 Source1:			http://www.antlr.org/download/C/libantlr3c-%{antlr_version}.tar.gz
@@ -195,7 +195,14 @@ popd
 
 # Build the C runtime
 pushd libantlr3c-%{antlr_version}
+
+%ifarch x86_64
+%configure --disable-abiflags --enable-debuginfo --enable-64bit
+%endif
+%ifarch %{ix86}
 %configure --disable-abiflags --enable-debuginfo
+%endif
+
 sed -i "s/CFLAGS = .*/CFLAGS = $RPM_OPT_FLAGS/" Makefile
 make %{?_smp_mflags}
 doxygen -u # update doxygen configuration file
@@ -314,6 +321,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_mavenpomdir}/JPP-maven-gunit-plugin.pom
 
 %changelog
+* Thu Apr 22 2010 Miloš Jakubíček <xjakub@fi.muni.cz> - 3.2-5
+- Build the C runtime with --enable-64bit on x86_64 to avoid undeterministic
+  segfaults caused by possible invalid conversion of 64bit pointers to int32_t 
+
 * Mon Mar 08 2010 Miloš Jakubíček <xjakub@fi.muni.cz> - 3.2-4
 - Patch Java runtime build to include OSGi meta-information in the manifest
   (thanks to Mat Booth)
