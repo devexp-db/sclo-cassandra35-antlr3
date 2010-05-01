@@ -9,7 +9,7 @@
 Summary:			ANother Tool for Language Recognition
 Name:				antlr3
 Version:			%{antlr_version}
-Release:			5%{?dist}
+Release:			6%{?dist}
 URL:				http://www.antlr.org/
 Source0:			http://www.antlr.org/download/antlr-%{antlr_version}.tar.gz
 Source1:			http://www.antlr.org/download/C/libantlr3c-%{antlr_version}.tar.gz
@@ -23,6 +23,8 @@ Source8:			http://mirrors.ibiblio.org/pub/mirrors/maven2/org/antlr/antlr3-maven-
 %endif
 # No buildnumber and findbugs:
 Patch0:				antlr-pom.patch
+# Python version mismatch patch, to be possibly upstreamed:
+Patch1:				antlr-python-3.1.2-version.patch
 License:			BSD
 Group:				Development/Libraries
 BuildRoot:			%{_tmppath}/%{name}-%{antlr_version}-%{release}-root-%(%{__id_u} -n)
@@ -146,6 +148,7 @@ Python run-time support for ANTLR-generated parsers
 %prep
 %setup -q -n antlr-%{antlr_version} -a 1 -a 2 -a 3 
 %patch0 -b .orig
+%patch1 -b .orig
 %if %{with_bootstrap}
 cp %{SOURCE6} settings.xml 
 %endif
@@ -321,6 +324,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_mavenpomdir}/JPP-maven-gunit-plugin.pom
 
 %changelog
+* Sat May 01 2010 Miloš Jakubíček <xjakub@fi.muni.cz> - 3.2-6
+- Patch the Python runtime to print just a warning in case of version mismatch
+  instead of raising an exception (since there is a good change it will work).
+
 * Thu Apr 22 2010 Miloš Jakubíček <xjakub@fi.muni.cz> - 3.2-5
 - Build the C runtime with --enable-64bit on x86_64 to avoid undeterministic
   segfaults caused by possible invalid conversion of 64bit pointers to int32_t 
