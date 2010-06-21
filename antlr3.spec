@@ -9,7 +9,7 @@
 Summary:			ANother Tool for Language Recognition
 Name:				antlr3
 Version:			%{antlr_version}
-Release:			6%{?dist}
+Release:			7%{?dist}
 URL:				http://www.antlr.org/
 Source0:			http://www.antlr.org/download/antlr-%{antlr_version}.tar.gz
 Source1:			http://www.antlr.org/download/C/libantlr3c-%{antlr_version}.tar.gz
@@ -217,9 +217,13 @@ rm -rf $RPM_BUILD_ROOT
 mkdir -p $RPM_BUILD_ROOT{%{_javadir},%{_mavenpomdir},%{_bindir},%{_datadir}/antlr,%{_mandir}}
 
 # install maven POMs
+install -pm 644 pom.xml $RPM_BUILD_ROOT/%{_mavenpomdir}/JPP-antlr3-master.pom
+install -pm 644 runtime/Java/pom.xml $RPM_BUILD_ROOT/%{_mavenpomdir}/JPP-antlr3-runtime.pom
 install -pm 644 tool/pom.xml $RPM_BUILD_ROOT/%{_mavenpomdir}/JPP-antlr.pom
 install -pm 644 antlr3-maven-plugin/pom.xml $RPM_BUILD_ROOT/%{_mavenpomdir}/JPP-antlr3-maven-plugin.pom
 install -pm 644 gunit-maven-plugin/pom.xml $RPM_BUILD_ROOT/%{_mavenpomdir}/JPP-maven-gunit-plugin.pom
+%add_to_maven_depmap org.antlr antlr-master %{antlr_version} JPP antlr3-master
+%add_to_maven_depmap org.antlr antlr-runtime %{antlr_version} JPP antlr3-runtime
 %add_to_maven_depmap org.antlr antlr %{antlr_version} JPP antlr3
 %add_to_maven_depmap org.antlr antlr3-maven-plugin %{antlr_version} JPP antlr3-maven-plugin
 %add_to_maven_depmap org.antlr maven-gunit-plugin %{antlr_version} JPP maven-gunit-plugin
@@ -268,10 +272,10 @@ popd
 %postun gunit
 %update_maven_depmap
 
-%post tool
+%post java
 %update_maven_depmap
 
-%postun tool
+%postun java
 %update_maven_depmap
 
 %post C -p /sbin/ldconfig
@@ -290,7 +294,6 @@ rm -rf $RPM_BUILD_ROOT
 %{_bindir}/antlr3
 %{_mavenpomdir}/JPP-antlr3-maven-plugin.pom
 %{_mavenpomdir}/JPP-antlr.pom
-%config %{_mavendepmapfragdir}/antlr3
 
 %files python
 %defattr(0644,root,root,-)
@@ -313,6 +316,9 @@ rm -rf $RPM_BUILD_ROOT
 %files java
 %defattr(-,root,root,-)
 %{_javadir}/*runtime*.jar
+%{_mavenpomdir}/JPP-antlr3-master.pom
+%{_mavenpomdir}/JPP-antlr3-runtime.pom
+%config %{_mavendepmapfragdir}/antlr3
 
 %files javascript
 %defattr(-,root,root,-)
@@ -324,6 +330,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_mavenpomdir}/JPP-maven-gunit-plugin.pom
 
 %changelog
+* Thu Jun 17 2010 Lubomir Rintel <lkundrak@v3.sk> - 3.2-7
+- Add master and runtime poms (#605267)
+
 * Sat May 01 2010 Miloš Jakubíček <xjakub@fi.muni.cz> - 3.2-6
 - Patch the Python runtime to print just a warning in case of version mismatch
   instead of raising an exception (since there is a good change it will work).
