@@ -9,7 +9,7 @@
 Summary:			ANother Tool for Language Recognition
 Name:				antlr3
 Version:			%{antlr_version}
-Release:			8%{?dist}
+Release:			9%{?dist}
 URL:				http://www.antlr.org/
 Source0:			http://www.antlr.org/download/antlr-%{antlr_version}.tar.gz
 Source1:			http://www.antlr.org/download/C/libantlr3c-%{antlr_version}.tar.gz
@@ -330,6 +330,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_mavenpomdir}/JPP-maven-gunit-plugin.pom
 
 %changelog
+* Wed Aug 11 2010 David Malcolm <dmalcolm@redhat.com> - 3.2-9
+- recompiling .py files against Python 2.7 (rhbz#623269)
+
 * Wed Jul 21 2010 David Malcolm <dmalcolm@redhat.com> - 3.2-8
 - Rebuilt for https://fedoraproject.org/wiki/Features/Python_2.7/MassRebuild
 
