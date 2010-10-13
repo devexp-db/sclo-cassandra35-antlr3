@@ -32,6 +32,7 @@ BuildRequires:		java-devel >= 1:1.6.0
 BuildRequires:		jpackage-utils
 BuildRequires:		antlr-maven-plugin
 BuildRequires:		maven2
+BuildRequires:		maven-javadoc-plugin
 BuildRequires:		maven-plugin-bundle
 BuildRequires:		maven2-plugin-resources
 BuildRequires:		maven2-plugin-compiler
