@@ -180,14 +180,11 @@ sed -i -e \
 
 mkdir -p $MAVEN_REPO_LOCAL/JPP/maven2/default_poms/
 mkdir -p $MAVEN_REPO_LOCAL/org.antlr/
-mkdir -p $MAVEN_REPO_LOCAL/JPP/maven2/plugins/
 cp antlr3-maven-plugin/pom.xml $MAVEN_REPO_LOCAL/JPP/maven2/default_poms/JPP-antlr3-maven-plugin.pom
 # install prebuilt antlr and antlr3-maven-plugin into repository
 # Man, this is hackish. Hold your nose.
 cp %{SOURCE7} $MAVEN_REPO_LOCAL/org.antlr/antlr.jar
-cp %{SOURCE7} $MAVEN_REPO_LOCAL/JPP/antlr3.jar
-cp %{SOURCE8} $MAVEN_REPO_LOCAL/JPP/antlr3-maven-plugin.jar
-cp %{SOURCE8} $MAVEN_REPO_LOCAL/JPP/maven2/plugins/antlr3-maven-plugin.jar
+cp %{SOURCE8} $MAVEN_REPO_LOCAL/org.antlr/antlr3-maven-plugin.jar
 %endif
 
 # Build antlr
