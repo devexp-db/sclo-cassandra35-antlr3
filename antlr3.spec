@@ -1,6 +1,6 @@
 %{!?python_sitelib: %global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")}
 
-%global with_bootstrap 1
+%global with_bootstrap 0
 
 %global antlr_version 3.2
 %global python_runtime_version 3.1.2
@@ -9,7 +9,7 @@
 Summary:			ANother Tool for Language Recognition
 Name:				antlr3
 Version:			%{antlr_version}
-Release:			10%{?dist}
+Release:			11%{?dist}
 URL:				http://www.antlr.org/
 Source0:			http://www.antlr.org/download/antlr-%{antlr_version}.tar.gz
 Source1:			http://www.antlr.org/download/C/libantlr3c-%{antlr_version}.tar.gz
@@ -341,6 +341,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_mavenpomdir}/JPP-maven-gunit-plugin.pom
 
 %changelog
+* Wed Oct 13 2010 Tom "spot" Callaway <tcallawa@redhat.com> - 3.2-11
+- non-bootstrap build
+
 * Wed Oct 13 2010 Tom "spot" Callaway <tcallawa@redhat.com> - 3.2-10
 - fix pom patch
 - fix bootstrapping
