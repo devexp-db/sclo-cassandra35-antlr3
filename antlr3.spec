@@ -1,6 +1,6 @@
 %{!?python_sitelib: %global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")}
 
-%global with_bootstrap 0
+%global with_bootstrap 1
 
 %global antlr_version 3.2
 %global python_runtime_version 3.1.2
@@ -9,7 +9,7 @@
 Summary:			ANother Tool for Language Recognition
 Name:				antlr3
 Version:			%{antlr_version}
-Release:			9%{?dist}
+Release:			10%{?dist}
 URL:				http://www.antlr.org/
 Source0:			http://www.antlr.org/download/antlr-%{antlr_version}.tar.gz
 Source1:			http://www.antlr.org/download/C/libantlr3c-%{antlr_version}.tar.gz
@@ -30,6 +30,7 @@ Group:				Development/Libraries
 BuildRoot:			%{_tmppath}/%{name}-%{antlr_version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires:		java-devel >= 1:1.6.0
 BuildRequires:		jpackage-utils
+BuildRequires:		antlr-maven-plugin
 BuildRequires:		maven2
 BuildRequires:		maven-plugin-bundle
 BuildRequires:		maven2-plugin-resources
@@ -37,7 +38,6 @@ BuildRequires:		maven2-plugin-compiler
 BuildRequires:		maven2-plugin-jar
 BuildRequires:		maven2-plugin-install
 BuildRequires:		maven2-plugin-assembly
-BuildRequires:		maven2-plugin-antlr
 BuildRequires:		maven2-plugin-plugin
 BuildRequires:		maven2-plugin-site
 BuildRequires:		maven2-plugin-project-info-reports
@@ -49,7 +49,7 @@ BuildRequires:		tomcat5-servlet-2.4-api
 BuildRequires:		tomcat5
 BuildRequires:		stringtemplate >= 3.2
 %if ! %{with_bootstrap}
-BuildRequires:		antlr3 >= 3.2
+BuildRequires:		antlr3-tool >= 3.2
 %endif
 
 %description
@@ -147,19 +147,21 @@ Python run-time support for ANTLR-generated parsers
 
 %prep
 %setup -q -n antlr-%{antlr_version} -a 1 -a 2 -a 3 
-%patch0 -b .orig
+%patch0 -b .pomfix
 %patch1 -b .orig
 %if %{with_bootstrap}
 cp %{SOURCE6} settings.xml 
 %endif
 
 %build
-export MAVEN_REPO_LOCAL=$(pwd)/.m2/repository
 sed -i "s,\${buildNumber},`cat %{_sysconfdir}/fedora-release` `date`," tool/src/main/resources/org/antlr/antlr.properties
 
 # remove corrupted files:
 rm antlr3-maven-plugin/src/main/java/org/antlr/mojo/antlr3/._*
 rm gunit-maven-plugin/src/main/java/org/antlr/mojo/antlr3/._GUnitExecuteMojo.java
+
+export MAVEN_REPO_LOCAL=$(pwd)/.m2/repository
+mkdir -p $MAVEN_REPO_LOCAL
 
 %if %{with_bootstrap}
 # we need antlr3-maven-plugin in place
@@ -178,10 +180,14 @@ sed -i -e \
 
 mkdir -p $MAVEN_REPO_LOCAL/JPP/maven2/default_poms/
 mkdir -p $MAVEN_REPO_LOCAL/org.antlr/
-cp antlr3-maven-plugin/pom.xml $MAVEN_REPO_LOCAL/JPP/maven2/default_poms/org.antlr-antlr3-maven-plugin.pom
+mkdir -p $MAVEN_REPO_LOCAL/JPP/maven2/plugins/
+cp antlr3-maven-plugin/pom.xml $MAVEN_REPO_LOCAL/JPP/maven2/default_poms/JPP-antlr3-maven-plugin.pom
 # install prebuilt antlr and antlr3-maven-plugin into repository
+# Man, this is hackish. Hold your nose.
 cp %{SOURCE7} $MAVEN_REPO_LOCAL/org.antlr/antlr.jar
-cp %{SOURCE8} $MAVEN_REPO_LOCAL/org.antlr/antlr3-maven-plugin.jar
+cp %{SOURCE7} $MAVEN_REPO_LOCAL/JPP/antlr3.jar
+cp %{SOURCE8} $MAVEN_REPO_LOCAL/JPP/antlr3-maven-plugin.jar
+cp %{SOURCE8} $MAVEN_REPO_LOCAL/JPP/maven2/plugins/antlr3-maven-plugin.jar
 %endif
 
 # Build antlr
@@ -190,6 +196,13 @@ mvn-jpp -s $(pwd)/settings.xml -Dmaven.repo.local=$MAVEN_REPO_LOCAL -Dmaven.test
 %else
 mvn-jpp -Dmaven.repo.local=$MAVEN_REPO_LOCAL -Dmaven.test.skip=true install
 %endif
+
+# Build the plugin
+pushd antlr3-maven-plugin
+mvn-jpp \
+-Dmaven.repo.local=$MAVEN_REPO_LOCAL \
+install javadoc:javadoc
+popd
 
 # Build the python runtime
 pushd antlr_python_runtime-%{python_runtime_version}
@@ -330,6 +343,11 @@ rm -rf $RPM_BUILD_ROOT
 %{_mavenpomdir}/JPP-maven-gunit-plugin.pom
 
 %changelog
+* Wed Oct 13 2010 Tom "spot" Callaway <tcallawa@redhat.com> - 3.2-10
+- fix pom patch
+- fix bootstrapping
+- fix dependencies
+
 * Wed Aug 11 2010 David Malcolm <dmalcolm@redhat.com> - 3.2-9
 - recompiling .py files against Python 2.7 (rhbz#623269)
 
