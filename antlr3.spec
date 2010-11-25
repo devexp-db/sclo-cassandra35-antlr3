@@ -9,7 +9,7 @@
 Summary:			ANother Tool for Language Recognition
 Name:				antlr3
 Version:			%{antlr_version}
-Release:			11%{?dist}
+Release:			12%{?dist}
 URL:				http://www.antlr.org/
 Source0:			http://www.antlr.org/download/antlr-%{antlr_version}.tar.gz
 Source1:			http://www.antlr.org/download/C/libantlr3c-%{antlr_version}.tar.gz
@@ -83,6 +83,7 @@ Summary:		Gunit is a unit testing framework for ANTLR grammars
 BuildArch:		noarch
 Requires:		jpackage-utils
 Requires:		java >= 1:1.6.0
+Requires:               %{name}-java = %{antlr_version}-%{release}
 
 %description	gunit
 This package provides support for Gunit, a unit testing framework
@@ -230,7 +231,7 @@ mkdir -p $RPM_BUILD_ROOT{%{_javadir},%{_mavenpomdir},%{_bindir},%{_datadir}/antl
 # install maven POMs
 install -pm 644 pom.xml $RPM_BUILD_ROOT/%{_mavenpomdir}/JPP-antlr3-master.pom
 install -pm 644 runtime/Java/pom.xml $RPM_BUILD_ROOT/%{_mavenpomdir}/JPP-antlr3-runtime.pom
-install -pm 644 tool/pom.xml $RPM_BUILD_ROOT/%{_mavenpomdir}/JPP-antlr.pom
+install -pm 644 tool/pom.xml $RPM_BUILD_ROOT/%{_mavenpomdir}/JPP-antlr3.pom
 install -pm 644 antlr3-maven-plugin/pom.xml $RPM_BUILD_ROOT/%{_mavenpomdir}/JPP-antlr3-maven-plugin.pom
 install -pm 644 gunit-maven-plugin/pom.xml $RPM_BUILD_ROOT/%{_mavenpomdir}/JPP-maven-gunit-plugin.pom
 %add_to_maven_depmap org.antlr antlr-master %{antlr_version} JPP antlr3-master
@@ -277,12 +278,6 @@ pushd antlr-javascript-runtime-%{javascript_runtime_version}
 install -pm 644 *.js $RPM_BUILD_ROOT%{_datadir}/antlr/
 popd
 
-%post gunit
-%update_maven_depmap
-
-%postun gunit
-%update_maven_depmap
-
 %post java
 %update_maven_depmap
 
@@ -303,8 +298,6 @@ rm -rf $RPM_BUILD_ROOT
 %{_javadir}/antlr3-maven*.jar
 %{_javadir}/antlr-%{antlr_version}.jar
 %{_bindir}/antlr3
-%{_mavenpomdir}/JPP-antlr3-maven-plugin.pom
-%{_mavenpomdir}/JPP-antlr.pom
 
 %files python
 %defattr(0644,root,root,-)
@@ -327,8 +320,7 @@ rm -rf $RPM_BUILD_ROOT
 %files java
 %defattr(-,root,root,-)
 %{_javadir}/*runtime*.jar
-%{_mavenpomdir}/JPP-antlr3-master.pom
-%{_mavenpomdir}/JPP-antlr3-runtime.pom
+%{_mavenpomdir}/*.pom
 %config %{_mavendepmapfragdir}/antlr3
 
 %files javascript
@@ -338,9 +330,13 @@ rm -rf $RPM_BUILD_ROOT
 %files gunit
 %defattr(-,root,root,-)
 %{_javadir}/*gunit*.jar
-%{_mavenpomdir}/JPP-maven-gunit-plugin.pom
 
 %changelog
+* Thu Nov 25 2010 Stanislav Ochotnicky <sochotnicky@redhat.com> - 3.2-12
+- Move all pom files into java subpackage
+- Fix pom filenames (Resolves rhbz#655831)
+- Add java subpackage Requires for gunit subpackage
+
 * Wed Oct 13 2010 Tom "spot" Callaway <tcallawa@redhat.com> - 3.2-11
 - non-bootstrap build
 
