@@ -9,7 +9,7 @@
 Summary:			ANother Tool for Language Recognition
 Name:				antlr3
 Version:			%{antlr_version}
-Release:			12%{?dist}
+Release:			13%{?dist}
 URL:				http://www.antlr.org/
 Source0:			http://www.antlr.org/download/antlr-%{antlr_version}.tar.gz
 Source1:			http://www.antlr.org/download/C/libantlr3c-%{antlr_version}.tar.gz
@@ -31,24 +31,15 @@ BuildRoot:			%{_tmppath}/%{name}-%{antlr_version}-%{release}-root-%(%{__id_u} -n
 BuildRequires:		java-devel >= 1:1.6.0
 BuildRequires:		jpackage-utils
 BuildRequires:		antlr-maven-plugin
-BuildRequires:		maven2
-BuildRequires:		maven-javadoc-plugin
 BuildRequires:		maven-plugin-bundle
-BuildRequires:		maven2-plugin-resources
-BuildRequires:		maven2-plugin-compiler
-BuildRequires:		maven2-plugin-jar
-BuildRequires:		maven2-plugin-install
-BuildRequires:		maven2-plugin-assembly
-BuildRequires:		maven2-plugin-plugin
-BuildRequires:		maven2-plugin-site
-BuildRequires:		maven2-plugin-project-info-reports
-BuildRequires:		maven-surefire-maven-plugin
+BuildRequires:		maven-assembly-plugin
 BuildRequires:		maven-shared-reporting-impl
 BuildRequires:		maven-surefire-provider-junit4
 BuildRequires:		junit4
-BuildRequires:		tomcat5-servlet-2.4-api
-BuildRequires:		tomcat5
+BuildRequires:		tomcat6-servlet-2.5-api
+BuildRequires:		tomcat6
 BuildRequires:		stringtemplate >= 3.2
+BuildRequires:		felix-parent
 %if ! %{with_bootstrap}
 BuildRequires:		antlr3-tool >= 3.2
 %endif
@@ -56,7 +47,7 @@ BuildRequires:		antlr3-tool >= 3.2
 %description
 ANother Tool for Language Recognition, is a language tool
 that provides a framework for constructing recognizers,
-interpreters, compilers, and translators from grammatical 
+interpreters, compilers, and translators from grammatical
 descriptions containing actions in a variety of target languages.
 
 %package		tool
@@ -74,7 +65,7 @@ Requires:		stringtemplate >= 3.2
 %description	tool
 ANother Tool for Language Recognition, is a language tool
 that provides a framework for constructing recognizers,
-interpreters, compilers, and translators from grammatical 
+interpreters, compilers, and translators from grammatical
 descriptions containing actions in a variety of target languages.
 
 %package		gunit
@@ -93,6 +84,7 @@ for ANTLR grammars.
 Group:			Development/Libraries
 Summary:		Java run-time support for ANTLR-generated parsers
 BuildArch:		noarch
+Requires:               stringtemplate
 Requires:		jpackage-utils
 Requires:		java >= 1:1.6.0
 
@@ -148,11 +140,11 @@ Version:		%{python_runtime_version}
 Python run-time support for ANTLR-generated parsers
 
 %prep
-%setup -q -n antlr-%{antlr_version} -a 1 -a 2 -a 3 
+%setup -q -n antlr-%{antlr_version} -a 1 -a 2 -a 3
 %patch0 -b .pomfix
 %patch1 -b .orig
 %if %{with_bootstrap}
-cp %{SOURCE6} settings.xml 
+cp %{SOURCE6} settings.xml
 %endif
 
 %build
@@ -332,6 +324,11 @@ rm -rf $RPM_BUILD_ROOT
 %{_javadir}/*gunit*.jar
 
 %changelog
+* Tue Dec 14 2010 Stanislav Ochotnicky <sochotnicky@redhat.com> - 3.2-13
+- Add stringtemplate to Requires of java subpackage
+- Use tomcat6 for building
+- Use felix-parent and cleanup BRs on maven plugins
+
 * Thu Nov 25 2010 Stanislav Ochotnicky <sochotnicky@redhat.com> - 3.2-12
 - Move all pom files into java subpackage
 - Fix pom filenames (Resolves rhbz#655831)
@@ -360,7 +357,7 @@ rm -rf $RPM_BUILD_ROOT
 
 * Thu Apr 22 2010 Miloš Jakubíček <xjakub@fi.muni.cz> - 3.2-5
 - Build the C runtime with --enable-64bit on x86_64 to avoid undeterministic
-  segfaults caused by possible invalid conversion of 64bit pointers to int32_t 
+  segfaults caused by possible invalid conversion of 64bit pointers to int32_t
 
 * Mon Mar 08 2010 Miloš Jakubíček <xjakub@fi.muni.cz> - 3.2-4
 - Patch Java runtime build to include OSGi meta-information in the manifest
