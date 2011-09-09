@@ -9,7 +9,7 @@
 Summary:			ANother Tool for Language Recognition
 Name:				antlr3
 Version:			%{antlr_version}
-Release:			14%{?dist}
+Release:			15%{?dist}
 URL:				http://www.antlr.org/
 Source0:			http://www.antlr.org/download/antlr-%{antlr_version}.tar.gz
 Source1:			http://www.antlr.org/download/C/libantlr3c-%{antlr_version}.tar.gz
@@ -203,11 +203,11 @@ popd
 # Build the C runtime
 pushd libantlr3c-%{antlr_version}
 
-%ifarch x86_64 ppc64
-%configure --disable-abiflags --enable-debuginfo --enable-64bit
-%endif
-%ifarch %{ix86} ppc
-%configure --disable-abiflags --enable-debuginfo
+%configure --disable-abiflags --enable-debuginfo \
+%ifarch x86_64 ppc64 s390x sparc64
+    --enable-64bit
+%else
+    %{nil}
 %endif
 
 sed -i "s/CFLAGS = .*/CFLAGS = $RPM_OPT_FLAGS/" Makefile
@@ -324,6 +324,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_javadir}/*gunit*.jar
 
 %changelog
+* Fri Sep 09 2011 Dan Horák <dan[at]danny.cz> - 3.2-15
+- fix build on other arches
+
 * Mon Feb 07 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 3.2-14
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
 
