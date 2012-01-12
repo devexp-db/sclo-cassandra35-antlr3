@@ -9,7 +9,7 @@
 Summary:			ANother Tool for Language Recognition
 Name:				antlr3
 Version:			%{antlr_version}
-Release:			15%{?dist}
+Release:			16%{?dist}
 URL:				http://www.antlr.org/
 Source0:			http://www.antlr.org/download/antlr-%{antlr_version}.tar.gz
 Source1:			http://www.antlr.org/download/C/libantlr3c-%{antlr_version}.tar.gz
@@ -324,6 +324,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_javadir}/*gunit*.jar
 
 %changelog
+* Thu Jan 12 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 3.2-16
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_17_Mass_Rebuild
+
 * Fri Sep 09 2011 Dan Horák <dan[at]danny.cz> - 3.2-15
 - fix build on other arches
 
