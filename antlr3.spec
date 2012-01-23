@@ -2,14 +2,14 @@
 
 %global with_bootstrap 0
 
-%global antlr_version 3.2
-%global python_runtime_version 3.1.2
+%global antlr_version 3.4
+%global python_runtime_version 3.1.3
 %global javascript_runtime_version 3.1
 
 Summary:			ANother Tool for Language Recognition
 Name:				antlr3
 Version:			%{antlr_version}
-Release:			16%{?dist}
+Release:			1%{?dist}
 URL:				http://www.antlr.org/
 Source0:			http://www.antlr.org/download/antlr-%{antlr_version}.tar.gz
 Source1:			http://www.antlr.org/download/C/libantlr3c-%{antlr_version}.tar.gz
@@ -27,10 +27,11 @@ Patch0:				antlr-pom.patch
 Patch1:				antlr-python-3.1.2-version.patch
 License:			BSD
 Group:				Development/Libraries
-BuildRoot:			%{_tmppath}/%{name}-%{antlr_version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires:		java-devel >= 1:1.6.0
 BuildRequires:		jpackage-utils
 BuildRequires:		antlr-maven-plugin
+BuildRequires:      maven
+BuildRequires:      maven-enforcer-plugin
 BuildRequires:		maven-plugin-bundle
 BuildRequires:		maven-assembly-plugin
 BuildRequires:		maven-shared-reporting-impl
@@ -39,10 +40,14 @@ BuildRequires:		junit4
 BuildRequires:		tomcat6-servlet-2.5-api
 BuildRequires:		tomcat6
 BuildRequires:		stringtemplate >= 3.2
+BuildRequires:		stringtemplate4
 BuildRequires:		felix-parent
 %if ! %{with_bootstrap}
 BuildRequires:		antlr3-tool >= 3.2
 %endif
+
+# we don't build it now
+Obsoletes:       antlr3-gunit < 3.2-15
 
 %description
 ANother Tool for Language Recognition, is a language tool
@@ -141,18 +146,21 @@ Python run-time support for ANTLR-generated parsers
 
 %prep
 %setup -q -n antlr-%{antlr_version} -a 1 -a 2 -a 3
-%patch0 -b .pomfix
-%patch1 -b .orig
 %if %{with_bootstrap}
 cp %{SOURCE6} settings.xml
 %endif
-
-%build
 sed -i "s,\${buildNumber},`cat %{_sysconfdir}/fedora-release` `date`," tool/src/main/resources/org/antlr/antlr.properties
+
+sed -i 's:<module>antlr3-maven-archetype</module>::' pom.xml
+sed -i 's:<module>gunit</module>::' pom.xml
+sed -i 's:<module>gunit-maven-plugin</module>::' pom.xml
 
 # remove corrupted files:
 rm antlr3-maven-plugin/src/main/java/org/antlr/mojo/antlr3/._*
 rm gunit-maven-plugin/src/main/java/org/antlr/mojo/antlr3/._GUnitExecuteMojo.java
+
+
+%build
 
 export MAVEN_REPO_LOCAL=$(pwd)/.m2/repository
 mkdir -p $MAVEN_REPO_LOCAL
@@ -183,16 +191,15 @@ cp %{SOURCE8} $MAVEN_REPO_LOCAL/org.antlr/antlr3-maven-plugin.jar
 
 # Build antlr
 %if %{with_bootstrap}
-mvn-jpp -s $(pwd)/settings.xml -Dmaven.repo.local=$MAVEN_REPO_LOCAL -Dmaven.test.skip=true install
+mvn-rpmbuild -s $(pwd)/settings.xml -Dmaven.repo.local=$MAVEN_REPO_LOCAL -Dmaven.test.skip=true install
 %else
-mvn-jpp -Dmaven.repo.local=$MAVEN_REPO_LOCAL -Dmaven.test.skip=true install
+mvn-rpmbuild -Dmaven.repo.local=$MAVEN_REPO_LOCAL -Dmaven.test.skip=true install
 %endif
 
 # Build the plugin
 pushd antlr3-maven-plugin
-mvn-jpp \
--Dmaven.repo.local=$MAVEN_REPO_LOCAL \
-install javadoc:javadoc
+mvn-rpmbuild -Dmaven.repo.local=$MAVEN_REPO_LOCAL \
+             install javadoc:javadoc
 popd
 
 # Build the python runtime
@@ -201,7 +208,7 @@ pushd antlr_python_runtime-%{python_runtime_version}
 popd
 
 # Build the C runtime
-pushd libantlr3c-%{antlr_version}
+pushd libantlr3c-%{antlr_version}-beta4
 
 %configure --disable-abiflags --enable-debuginfo \
 %ifarch x86_64 ppc64 s390x sparc64
@@ -217,31 +224,38 @@ doxygen # build doxygen documentation
 popd
 
 %install
-rm -rf $RPM_BUILD_ROOT
 mkdir -p $RPM_BUILD_ROOT{%{_javadir},%{_mavenpomdir},%{_bindir},%{_datadir}/antlr,%{_mandir}}
 
 # install maven POMs
 install -pm 644 pom.xml $RPM_BUILD_ROOT/%{_mavenpomdir}/JPP-antlr3-master.pom
+%add_maven_depmap JPP-antlr3-master.pom
+
 install -pm 644 runtime/Java/pom.xml $RPM_BUILD_ROOT/%{_mavenpomdir}/JPP-antlr3-runtime.pom
 install -pm 644 tool/pom.xml $RPM_BUILD_ROOT/%{_mavenpomdir}/JPP-antlr3.pom
 install -pm 644 antlr3-maven-plugin/pom.xml $RPM_BUILD_ROOT/%{_mavenpomdir}/JPP-antlr3-maven-plugin.pom
 install -pm 644 gunit-maven-plugin/pom.xml $RPM_BUILD_ROOT/%{_mavenpomdir}/JPP-maven-gunit-plugin.pom
-%add_to_maven_depmap org.antlr antlr-master %{antlr_version} JPP antlr3-master
-%add_to_maven_depmap org.antlr antlr-runtime %{antlr_version} JPP antlr3-runtime
-%add_to_maven_depmap org.antlr antlr %{antlr_version} JPP antlr3
-%add_to_maven_depmap org.antlr antlr3-maven-plugin %{antlr_version} JPP antlr3-maven-plugin
-%add_to_maven_depmap org.antlr maven-gunit-plugin %{antlr_version} JPP maven-gunit-plugin
 
 # install jars
-install -m 644 runtime/Java/target/antlr-runtime-%{antlr_version}.jar \
-tool/target/antlr-%{antlr_version}.jar antlr3-maven-plugin/target/antlr3-maven-plugin-%{antlr_version}.jar \
-gunit/target/gunit-%{antlr_version}.jar gunit-maven-plugin/target/maven-gunit-plugin-%{antlr_version}.jar \
-$RPM_BUILD_ROOT%{_datadir}/java/
-pushd $RPM_BUILD_ROOT%{_datadir}/java
-ln -s antlr-%{antlr_version}.jar antlr3.jar
-ln -s antlr3-maven-plugin-%{antlr_version}.jar antlr3-maven-plugin.jar
-ln -s antlr-runtime-%{antlr_version}.jar antlr3-runtime.jar
-popd
+install -m 644 runtime/Java/target/antlr-runtime-3.2.jar \
+        $RPM_BUILD_ROOT%{_datadir}/java/antlr3-runtime.jar
+%add_maven_depmap JPP-antlr3-runtime.pom antlr3-runtime.jar
+
+install -m 644 tool/target/antlr-3.2.jar \
+        $RPM_BUILD_ROOT%{_datadir}/java/antlr3.jar
+%add_maven_depmap JPP-antlr3.pom antlr3.jar
+
+install -m 644 antlr3-maven-plugin/target/%{name}-maven-plugin-%{antlr_version}.jar \
+        $RPM_BUILD_ROOT%{_datadir}/java/%{name}-maven-plugin.jar
+%add_maven_depmap JPP-%{name}-maven-plugin.pom %{name}-maven-plugin.jar
+
+# We disable gunit because it currently fails to build, maybe after upgrade?
+#install gunit/target/gunit-%{antlr_version}.jar \
+#        $RPM_BUILD_ROOT%{_datadir}/java/gunit.jar
+
+#install -m 644 gunit-maven-plugin/target/maven-gunit-plugin-%{antlr_version}.jar \
+#        $RPM_BUILD_ROOT%{_datadir}/java/maven-gunit-plugin.jar
+#%%add_maven_depmap JPP-maven-gunit-plugin.pom maven-gunit.plugin.jar
+
 
 # install wrapper script
 install -m 755 %{SOURCE5} $RPM_BUILD_ROOT%{_bindir}/antlr3
@@ -252,7 +266,7 @@ pushd antlr_python_runtime-%{python_runtime_version}
 popd
 
 # install C runtime
-pushd libantlr3c-%{antlr_version}
+pushd libantlr3c-%{antlr_version}-beta4
 make DESTDIR=$RPM_BUILD_ROOT install
 rm $RPM_BUILD_ROOT%{_libdir}/libantlr3c.{a,la}
 pushd api/man/man3
@@ -270,60 +284,48 @@ pushd antlr-javascript-runtime-%{javascript_runtime_version}
 install -pm 644 *.js $RPM_BUILD_ROOT%{_datadir}/antlr/
 popd
 
-%post java
-%update_maven_depmap
-
-%postun java
-%update_maven_depmap
-
 %post C -p /sbin/ldconfig
 
 %postun C -p /sbin/ldconfig
 
-%clean
-rm -rf $RPM_BUILD_ROOT
-
 %files tool
-%defattr(-,root,root,-)
 %doc tool/{README.txt,LICENSE.txt,CHANGES.txt}
 %{_javadir}/antlr3.jar
 %{_javadir}/antlr3-maven*.jar
-%{_javadir}/antlr-%{antlr_version}.jar
 %{_bindir}/antlr3
 
 %files python
-%defattr(0644,root,root,-)
+%doc tool/LICENSE.txt
 %{python_sitelib}/antlr3/*
 %{python_sitelib}/antlr_python_runtime-*
 
 %files C
-%defattr(-,root,root,-)
+%doc tool/LICENSE.txt
 %{_libdir}/libantlr3c.so
 
 %files C-devel
-%defattr(-,root,root,-)
 %{_includedir}/antlr3*
 %{_mandir}/man3/*
 
 %files C-docs
-%defattr(-,root,root,-)
-%doc libantlr3c-%{antlr_version}/api/
+%doc libantlr3c-%{antlr_version}-beta4/api/
 
 %files java
-%defattr(-,root,root,-)
+%doc tool/LICENSE.txt
 %{_javadir}/*runtime*.jar
 %{_mavenpomdir}/*.pom
 %config %{_mavendepmapfragdir}/antlr3
 
 %files javascript
-%defattr(-,root,root,-)
+%doc tool/LICENSE.txt
 %{_datadir}/antlr/
 
-%files gunit
-%defattr(-,root,root,-)
-%{_javadir}/*gunit*.jar
-
 %changelog
+* Mon Jan 23 2012 Stanislav Ochotnicky <sochotnicky@redhat.com> - 3.4-1
+- Update antlr version to 3.4
+- Move to maven3 build, update macros etc
+- Remove gunit for now
+
 * Thu Jan 12 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 3.2-16
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_17_Mass_Rebuild
 
