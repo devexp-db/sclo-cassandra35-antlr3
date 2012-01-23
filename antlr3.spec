@@ -66,6 +66,7 @@ Obsoletes:		%{name} < %{antlr_version}-%{release}
 Requires:		%{name}-java = %{antlr_version}-%{release}
 Requires:		antlr
 Requires:		stringtemplate >= 3.2
+Requires:		stringtemplate4
 
 %description	tool
 ANother Tool for Language Recognition, is a language tool
@@ -73,23 +74,12 @@ that provides a framework for constructing recognizers,
 interpreters, compilers, and translators from grammatical
 descriptions containing actions in a variety of target languages.
 
-%package		gunit
-Group:			Development/Libraries
-Summary:		Gunit is a unit testing framework for ANTLR grammars
-BuildArch:		noarch
-Requires:		jpackage-utils
-Requires:		java >= 1:1.6.0
-Requires:               %{name}-java = %{antlr_version}-%{release}
-
-%description	gunit
-This package provides support for Gunit, a unit testing framework
-for ANTLR grammars.
-
 %package		java
 Group:			Development/Libraries
 Summary:		Java run-time support for ANTLR-generated parsers
 BuildArch:		noarch
-Requires:               stringtemplate
+Requires:       stringtemplate
+Requires:		stringtemplate4
 Requires:		jpackage-utils
 Requires:		java >= 1:1.6.0
 
