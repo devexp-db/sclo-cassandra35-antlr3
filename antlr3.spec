@@ -9,7 +9,7 @@
 Summary:            ANother Tool for Language Recognition
 Name:               antlr3
 Version:            %{antlr_version}
-Release:            2%{?dist}
+Release:            3%{?dist}
 URL:                http://www.antlr.org/
 Source0:            http://www.antlr.org/download/antlr-%{antlr_version}.tar.gz
 Source1:            http://www.antlr.org/download/C/libantlr3c-%{antlr_version}.tar.gz
@@ -223,11 +223,11 @@ install -pm 644 antlr3-maven-plugin/pom.xml $RPM_BUILD_ROOT/%{_mavenpomdir}/JPP-
 install -pm 644 gunit-maven-plugin/pom.xml $RPM_BUILD_ROOT/%{_mavenpomdir}/JPP-maven-gunit-plugin.pom
 
 # install jars
-install -m 644 runtime/Java/target/antlr-runtime-%{antlr_version}.jar \
+install -m 644 runtime/Java/target/antlr-runtime-*.jar \
         $RPM_BUILD_ROOT%{_datadir}/java/antlr3-runtime.jar
 %add_maven_depmap JPP-antlr3-runtime.pom antlr3-runtime.jar
 
-install -m 644 tool/target/antlr-%{antlr_version}.jar \
+install -m 644 tool/target/antlr-*.jar \
         $RPM_BUILD_ROOT%{_datadir}/java/antlr3.jar
 %add_maven_depmap JPP-antlr3.pom antlr3.jar
 
@@ -308,6 +308,9 @@ popd
 %{_datadir}/antlr/
 
 %changelog
+* Thu Feb 16 2012 Stanislav Ochotnicky <sochotnicky@redhat.com> - 3.4-3
+- Use wildcards for installing jars (different results on different releases)
+
 * Thu Feb 16 2012 Stanislav Ochotnicky <sochotnicky@redhat.com> - 3.4-2
 - Add builnumber plugin to buildrequires
 - Tab/space cleanup
