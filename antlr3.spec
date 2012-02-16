@@ -223,11 +223,11 @@ install -pm 644 antlr3-maven-plugin/pom.xml $RPM_BUILD_ROOT/%{_mavenpomdir}/JPP-
 install -pm 644 gunit-maven-plugin/pom.xml $RPM_BUILD_ROOT/%{_mavenpomdir}/JPP-maven-gunit-plugin.pom
 
 # install jars
-install -m 644 runtime/Java/target/antlr-runtime-%{version}.jar \
+install -m 644 runtime/Java/target/antlr-runtime-%{antlr_version}.jar \
         $RPM_BUILD_ROOT%{_datadir}/java/antlr3-runtime.jar
 %add_maven_depmap JPP-antlr3-runtime.pom antlr3-runtime.jar
 
-install -m 644 tool/target/antlr-%{version}.jar \
+install -m 644 tool/target/antlr-%{antlr_version}.jar \
         $RPM_BUILD_ROOT%{_datadir}/java/antlr3.jar
 %add_maven_depmap JPP-antlr3.pom antlr3.jar
 
