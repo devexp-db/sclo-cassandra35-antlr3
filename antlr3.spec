@@ -6,44 +6,41 @@
 %global python_runtime_version 3.1.3
 %global javascript_runtime_version 3.1
 
-Summary:			ANother Tool for Language Recognition
-Name:				antlr3
-Version:			%{antlr_version}
-Release:			2%{?dist}
-URL:				http://www.antlr.org/
-Source0:			http://www.antlr.org/download/antlr-%{antlr_version}.tar.gz
-Source1:			http://www.antlr.org/download/C/libantlr3c-%{antlr_version}.tar.gz
-Source2:			http://www.antlr.org/download/Python/antlr_python_runtime-%{python_runtime_version}.tar.gz
-Source3:			http://www.antlr.org/download/antlr-javascript-runtime-%{javascript_runtime_version}.zip
-Source5:			antlr3
+Summary:            ANother Tool for Language Recognition
+Name:               antlr3
+Version:            %{antlr_version}
+Release:            4%{?dist}
+URL:                http://www.antlr.org/
+Source0:            http://www.antlr.org/download/antlr-%{antlr_version}.tar.gz
+Source1:            http://www.antlr.org/download/C/libantlr3c-%{antlr_version}.tar.gz
+Source2:            http://www.antlr.org/download/Python/antlr_python_runtime-%{python_runtime_version}.tar.gz
+Source3:            http://www.antlr.org/download/antlr-javascript-runtime-%{javascript_runtime_version}.zip
+Source5:            antlr3
 %if %{with_bootstrap}
-Source6:			settings.xml
-Source7:			http://www.antlr.org/download/antlr-%{antlr_version}.jar
-Source8:			http://mirrors.ibiblio.org/pub/mirrors/maven2/org/antlr/antlr3-maven-plugin/%{antlr_version}/antlr3-maven-plugin-%{antlr_version}.jar
+Source6:            settings.xml
+Source7:            http://www.antlr.org/download/antlr-%{antlr_version}.jar
+Source8:            http://mirrors.ibiblio.org/pub/mirrors/maven2/org/antlr/antlr3-maven-plugin/%{antlr_version}/antlr3-maven-plugin-%{antlr_version}.jar
 %endif
-# No buildnumber and findbugs:
-Patch0:				antlr-pom.patch
-# Python version mismatch patch, to be possibly upstreamed:
-Patch1:				antlr-python-3.1.2-version.patch
-License:			BSD
-Group:				Development/Libraries
-BuildRequires:		java-devel >= 1:1.6.0
-BuildRequires:		jpackage-utils
-BuildRequires:		antlr-maven-plugin
+License:            BSD
+Group:              Development/Libraries
+BuildRequires:      java-devel >= 1:1.6.0
+BuildRequires:      jpackage-utils
+BuildRequires:      antlr-maven-plugin
 BuildRequires:      maven
 BuildRequires:      maven-enforcer-plugin
-BuildRequires:		maven-plugin-bundle
-BuildRequires:		maven-assembly-plugin
-BuildRequires:		maven-shared-reporting-impl
-BuildRequires:		maven-surefire-provider-junit4
-BuildRequires:		junit4
-BuildRequires:		tomcat6-servlet-2.5-api
-BuildRequires:		tomcat6
-BuildRequires:		stringtemplate >= 3.2
-BuildRequires:		stringtemplate4
-BuildRequires:		felix-parent
+BuildRequires:      maven-plugin-bundle
+BuildRequires:      maven-assembly-plugin
+BuildRequires:      maven-shared-reporting-impl
+BuildRequires:      maven-surefire-provider-junit4
+BuildRequires:      buildnumber-maven-plugin
+BuildRequires:      junit4
+BuildRequires:      tomcat6-servlet-2.5-api
+BuildRequires:      tomcat6
+BuildRequires:      stringtemplate >= 3.2
+BuildRequires:      stringtemplate4
+BuildRequires:      felix-parent
 %if ! %{with_bootstrap}
-BuildRequires:		antlr3-tool >= 3.2
+BuildRequires:      antlr3-tool >= 3.2
 %endif
 
 # we don't build it now
@@ -55,83 +52,83 @@ that provides a framework for constructing recognizers,
 interpreters, compilers, and translators from grammatical
 descriptions containing actions in a variety of target languages.
 
-%package		tool
-Group:			Development/Libraries
-Summary:		ANother Tool for Language Recognition
-BuildArch:		noarch
-Requires:		jpackage-utils
-Requires:		java >= 1:1.6.0
-Provides:		%{name} = %{antlr_version}-%{release}
-Obsoletes:		%{name} < %{antlr_version}-%{release}
-Requires:		%{name}-java = %{antlr_version}-%{release}
-Requires:		antlr
-Requires:		stringtemplate >= 3.2
-Requires:		stringtemplate4
+%package     tool
+Group:       Development/Libraries
+Summary:     ANother Tool for Language Recognition
+BuildArch:   noarch
+Requires:    jpackage-utils
+Requires:    java >= 1:1.6.0
+Provides:    %{name} = %{antlr_version}-%{release}
+Obsoletes:   %{name} < %{antlr_version}-%{release}
+Requires:    %{name}-java = %{antlr_version}-%{release}
+Requires:    antlr
+Requires:    stringtemplate >= 3.2
+Requires:    stringtemplate4
 
-%description	tool
+%description tool
 ANother Tool for Language Recognition, is a language tool
 that provides a framework for constructing recognizers,
 interpreters, compilers, and translators from grammatical
 descriptions containing actions in a variety of target languages.
 
-%package		java
-Group:			Development/Libraries
-Summary:		Java run-time support for ANTLR-generated parsers
-BuildArch:		noarch
-Requires:       stringtemplate
-Requires:		stringtemplate4
-Requires:		jpackage-utils
-Requires:		java >= 1:1.6.0
+%package     java
+Group:       Development/Libraries
+Summary:     Java run-time support for ANTLR-generated parsers
+BuildArch:   noarch
+Requires:    stringtemplate
+Requires:    stringtemplate4
+Requires:    jpackage-utils
+Requires:    java >= 1:1.6.0
 
-%description	java
+%description java
 Java run-time support for ANTLR-generated parsers
 
-%package		javascript
-Group:			Development/Libraries
-Summary:		Javascript run-time support for ANTLR-generated parsers
-Version:		%{javascript_runtime_version}
-BuildArch:		noarch
+%package      javascript
+Group:        Development/Libraries
+Summary:      Javascript run-time support for ANTLR-generated parsers
+Version:      %{javascript_runtime_version}
+BuildArch:    noarch
 
-%description	javascript
+%description  javascript
 Javascript run-time support for ANTLR-generated parsers
 
-%package		C
-Group:			Development/Libraries
-Summary:		C run-time support for ANTLR-generated parsers
+%package   C
+Group:     Development/Libraries
+Summary:   C run-time support for ANTLR-generated parsers
 
-%description	C
+%description C
 C run-time support for ANTLR-generated parsers
 
-%package		C-devel
-Group:			Development/Libraries
-Summary:		Header files for the C bindings for ANTLR-generated parsers
-Requires:		%{name}-C = %{antlr_version}-%{release}
+%package   C-devel
+Group:     Development/Libraries
+Summary:   Header files for the C bindings for ANTLR-generated parsers
+Requires:  %{name}-C = %{antlr_version}-%{release}
 
-%description	C-devel
+%description C-devel
 Header files for the C bindings for ANTLR-generated parsers
 
-%package		C-docs
-Group:			Documentation
-Summary:		API documentation for the C run-time support for ANTLR-generated parsers
-BuildArch:		noarch
-BuildRequires:	graphviz
-BuildRequires:	doxygen
-Requires:		%{name}-C = %{antlr_version}-%{release}
+%package        C-docs
+Group:          Documentation
+Summary:        API documentation for the C run-time support for ANTLR-generated parsers
+BuildArch:      noarch
+BuildRequires:  graphviz
+BuildRequires:  doxygen
+Requires:       %{name}-C = %{antlr_version}-%{release}
 
-%description	C-docs
+%description    C-docs
 This package contains doxygen documentation with instruction
 on how to use the C target in ANTLR and complete API description of the
 C run-time support for ANTLR-generated parsers.
 
-%package		python
-Group:			Development/Libraries
-Summary:		Python run-time support for ANTLR-generated parsers
-BuildRequires:	python-devel
-BuildRequires:	python-setuptools-devel
-BuildArch:		noarch
-Version:		%{python_runtime_version}
+%package        python
+Group:          Development/Libraries
+Summary:        Python run-time support for ANTLR-generated parsers
+BuildRequires:  python-devel
+BuildRequires:  python-setuptools-devel
+BuildArch:      noarch
+Version:        %{python_runtime_version}
 
-%description	python
+%description    python
 Python run-time support for ANTLR-generated parsers
 
 %prep
@@ -226,11 +223,11 @@ install -pm 644 antlr3-maven-plugin/pom.xml $RPM_BUILD_ROOT/%{_mavenpomdir}/JPP-
 install -pm 644 gunit-maven-plugin/pom.xml $RPM_BUILD_ROOT/%{_mavenpomdir}/JPP-maven-gunit-plugin.pom
 
 # install jars
-install -m 644 runtime/Java/target/antlr-runtime-3.2.jar \
+install -m 644 runtime/Java/target/antlr-runtime-*.jar \
         $RPM_BUILD_ROOT%{_datadir}/java/antlr3-runtime.jar
 %add_maven_depmap JPP-antlr3-runtime.pom antlr3-runtime.jar
 
-install -m 644 tool/target/antlr-3.2.jar \
+install -m 644 tool/target/antlr-*.jar \
         $RPM_BUILD_ROOT%{_datadir}/java/antlr3.jar
 %add_maven_depmap JPP-antlr3.pom antlr3.jar
 
@@ -253,7 +250,6 @@ install -m 755 %{SOURCE5} $RPM_BUILD_ROOT%{_bindir}/antlr3
 # install python runtime
 pushd antlr_python_runtime-%{python_runtime_version}
 %{__python} setup.py install -O1 --skip-build --root $RPM_BUILD_ROOT
-%{__python} setup.py install -O1 --skip-build --root $RPM_BUILD_ROOT
 chmod a+x $RPM_BUILD_ROOT%{python_sitelib}/antlr_python_runtime-*
 popd
 
@@ -263,7 +259,7 @@ make DESTDIR=$RPM_BUILD_ROOT install
 rm $RPM_BUILD_ROOT%{_libdir}/libantlr3c.{a,la}
 pushd api/man/man3
 for file in `ls -1 * | grep -vi "^antlr3"`; do
-	mv $file antlr3-$file
+    mv $file antlr3-$file
 done
 gzip *
 popd
@@ -313,8 +309,15 @@ popd
 %{_datadir}/antlr/
 
 %changelog
-* Wed Feb 22 2012 Miloš Jakubíček <xjakub@fi.muni.cz> - 3.4-2
+* Wed Feb 22 2012 Miloš Jakubíček <xjakub@fi.muni.cz> - 3.4-4
 - Fix permissions for egg-info dir (fixes BZ#790499)
+
+* Thu Feb 16 2012 Stanislav Ochotnicky <sochotnicky@redhat.com> - 3.4-3
+- Use wildcards for installing jars (different results on different releases)
+
+* Thu Feb 16 2012 Stanislav Ochotnicky <sochotnicky@redhat.com> - 3.4-2
+- Add builnumber plugin to buildrequires
+- Tab/space cleanup
 
 * Mon Jan 23 2012 Stanislav Ochotnicky <sochotnicky@redhat.com> - 3.4-1
 - Update antlr version to 3.4
