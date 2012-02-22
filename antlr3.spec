@@ -9,7 +9,7 @@
 Summary:			ANother Tool for Language Recognition
 Name:				antlr3
 Version:			%{antlr_version}
-Release:			1%{?dist}
+Release:			2%{?dist}
 URL:				http://www.antlr.org/
 Source0:			http://www.antlr.org/download/antlr-%{antlr_version}.tar.gz
 Source1:			http://www.antlr.org/download/C/libantlr3c-%{antlr_version}.tar.gz
@@ -252,7 +252,9 @@ install -m 755 %{SOURCE5} $RPM_BUILD_ROOT%{_bindir}/antlr3
 
 # install python runtime
 pushd antlr_python_runtime-%{python_runtime_version}
-%{__python} setup.py install -O1 --skip-build --root %{buildroot}
+%{__python} setup.py install -O1 --skip-build --root $RPM_BUILD_ROOT
+%{__python} setup.py install -O1 --skip-build --root $RPM_BUILD_ROOT
+chmod a+x $RPM_BUILD_ROOT%{python_sitelib}/antlr_python_runtime-*
 popd
 
 # install C runtime
@@ -311,6 +313,9 @@ popd
 %{_datadir}/antlr/
 
 %changelog
+* Wed Feb 22 2012 Miloš Jakubíček <xjakub@fi.muni.cz> - 3.4-2
+- Fix permissions for egg-info dir (fixes BZ#790499)
+
 * Mon Jan 23 2012 Stanislav Ochotnicky <sochotnicky@redhat.com> - 3.4-1
 - Update antlr version to 3.4
 - Move to maven3 build, update macros etc
