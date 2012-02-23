@@ -1,15 +1,15 @@
-%{!?python_sitelib: %global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")}
+#%{!?python_sitelib: %global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")}
 
 %global with_bootstrap 0
 
 %global antlr_version 3.4
-%global python_runtime_version 3.1.3
+#%global python_runtime_version 3.1.3
 %global javascript_runtime_version 3.1
 
 Summary:            ANother Tool for Language Recognition
 Name:               antlr3
 Version:            %{antlr_version}
-Release:            4%{?dist}
+Release:            5%{?dist}
 URL:                http://www.antlr.org/
 Source0:            http://www.antlr.org/download/antlr-%{antlr_version}.tar.gz
 Source1:            http://www.antlr.org/download/C/libantlr3c-%{antlr_version}.tar.gz
@@ -120,16 +120,16 @@ This package contains doxygen documentation with instruction
 on how to use the C target in ANTLR and complete API description of the
 C run-time support for ANTLR-generated parsers.
 
-%package        python
-Group:          Development/Libraries
-Summary:        Python run-time support for ANTLR-generated parsers
-BuildRequires:  python-devel
-BuildRequires:  python-setuptools-devel
-BuildArch:      noarch
-Version:        %{python_runtime_version}
-
-%description    python
-Python run-time support for ANTLR-generated parsers
+#%package        python
+#Group:          Development/Libraries
+#Summary:        Python run-time support for ANTLR-generated parsers
+#BuildRequires:  python-devel
+#BuildRequires:  python-setuptools-devel
+#BuildArch:      noarch
+#Version:        %{python_runtime_version}
+#
+#%description    python
+#Python run-time support for ANTLR-generated parsers
 
 %prep
 %setup -q -n antlr-%{antlr_version} -a 1 -a 2 -a 3
@@ -189,10 +189,10 @@ mvn-rpmbuild -Dmaven.repo.local=$MAVEN_REPO_LOCAL \
              install javadoc:javadoc
 popd
 
-# Build the python runtime
-pushd antlr_python_runtime-%{python_runtime_version}
-%{__python} setup.py build
-popd
+## Build the python runtime
+#pushd antlr_python_runtime-%{python_runtime_version}
+#%{__python} setup.py build
+#popd
 
 # Build the C runtime
 pushd libantlr3c-%{antlr_version}-beta4
@@ -247,11 +247,11 @@ install -m 644 antlr3-maven-plugin/target/%{name}-maven-plugin-%{antlr_version}.
 # install wrapper script
 install -m 755 %{SOURCE5} $RPM_BUILD_ROOT%{_bindir}/antlr3
 
-# install python runtime
-pushd antlr_python_runtime-%{python_runtime_version}
-%{__python} setup.py install -O1 --skip-build --root $RPM_BUILD_ROOT
-chmod a+x $RPM_BUILD_ROOT%{python_sitelib}/antlr_python_runtime-*
-popd
+## install python runtime
+#pushd antlr_python_runtime-%{python_runtime_version}
+#%{__python} setup.py install -O1 --skip-build --root $RPM_BUILD_ROOT
+#chmod a+x $RPM_BUILD_ROOT%{python_sitelib}/antlr_python_runtime-*
+#popd
 
 # install C runtime
 pushd libantlr3c-%{antlr_version}-beta4
@@ -282,10 +282,10 @@ popd
 %{_javadir}/antlr3-maven*.jar
 %{_bindir}/antlr3
 
-%files python
-%doc tool/LICENSE.txt
-%{python_sitelib}/antlr3/*
-%{python_sitelib}/antlr_python_runtime-*
+#%files python
+#%doc tool/LICENSE.txt
+#%{python_sitelib}/antlr3/*
+#%{python_sitelib}/antlr_python_runtime-*
 
 %files C
 %doc tool/LICENSE.txt
@@ -309,6 +309,9 @@ popd
 %{_datadir}/antlr/
 
 %changelog
+* Thu Feb 23 2012 Miloš Jakubíček <xjakub@fi.muni.cz> - 3.4-5
+- Disable python runtime (incompatible with current antlr version)
+
 * Wed Feb 22 2012 Miloš Jakubíček <xjakub@fi.muni.cz> - 3.4-4
 - Fix permissions for egg-info dir (fixes BZ#790499)
 
