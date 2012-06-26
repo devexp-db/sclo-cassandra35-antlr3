@@ -9,7 +9,7 @@
 Summary:            ANother Tool for Language Recognition
 Name:               antlr3
 Version:            %{antlr_version}
-Release:            5%{?dist}
+Release:            6%{?dist}
 URL:                http://www.antlr.org/
 Source0:            http://www.antlr.org/download/antlr-%{antlr_version}.tar.gz
 Source1:            http://www.antlr.org/download/C/libantlr3c-%{antlr_version}.tar.gz
@@ -25,7 +25,6 @@ License:            BSD
 Group:              Development/Libraries
 BuildRequires:      java-devel >= 1:1.6.0
 BuildRequires:      jpackage-utils
-BuildRequires:      antlr-maven-plugin
 BuildRequires:      maven
 BuildRequires:      maven-enforcer-plugin
 BuildRequires:      maven-plugin-bundle
@@ -36,7 +35,6 @@ BuildRequires:      buildnumber-maven-plugin
 BuildRequires:      junit4
 BuildRequires:      tomcat6-servlet-2.5-api
 BuildRequires:      tomcat6
-BuildRequires:      stringtemplate >= 3.2
 BuildRequires:      stringtemplate4
 BuildRequires:      felix-parent
 %if ! %{with_bootstrap}
@@ -61,8 +59,6 @@ Requires:    java >= 1:1.6.0
 Provides:    %{name} = %{antlr_version}-%{release}
 Obsoletes:   %{name} < %{antlr_version}-%{release}
 Requires:    %{name}-java = %{antlr_version}-%{release}
-Requires:    antlr
-Requires:    stringtemplate >= 3.2
 Requires:    stringtemplate4
 
 %description tool
@@ -75,7 +71,6 @@ descriptions containing actions in a variety of target languages.
 Group:       Development/Libraries
 Summary:     Java run-time support for ANTLR-generated parsers
 BuildArch:   noarch
-Requires:    stringtemplate
 Requires:    stringtemplate4
 Requires:    jpackage-utils
 Requires:    java >= 1:1.6.0
@@ -309,6 +304,10 @@ popd
 %{_datadir}/antlr/
 
 %changelog
+* Tue Jun 26 2012 Miloš Jakubíček <xjakub@fi.muni.cz> - 3.4-6
+- Fixed missing stringtemplate4 in antlr3 generator classpath
+- Cleanup of Requires and BuildRequires on antlr2
+
 * Thu Feb 23 2012 Miloš Jakubíček <xjakub@fi.muni.cz> - 3.4-5
 - Disable python runtime (incompatible with current antlr version)
 
