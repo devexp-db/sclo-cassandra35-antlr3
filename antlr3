@@ -14,7 +14,7 @@ fi
 # Configuration
 MAIN_CLASS="org.antlr.Tool"
 BASE_FLAGS=""
-BASE_JARS="antlr.jar stringtemplate.jar antlr3.jar antlr3-runtime.jar"
+BASE_JARS="antlr.jar stringtemplate.jar stringtemplate4.jar antlr3.jar antlr3-runtime.jar"
 
 # Set parameters
 set_jvm
