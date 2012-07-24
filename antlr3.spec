@@ -9,7 +9,7 @@
 Summary:            ANother Tool for Language Recognition
 Name:               antlr3
 Version:            %{antlr_version}
-Release:            7%{?dist}
+Release:            8%{?dist}
 URL:                http://www.antlr.org/
 Source0:            http://www.antlr.org/download/antlr-%{antlr_version}.tar.gz
 Source1:            http://www.antlr.org/download/C/libantlr3c-%{antlr_version}.tar.gz
@@ -36,6 +36,7 @@ BuildRequires:      junit4
 BuildRequires:      tomcat6-servlet-2.5-api
 BuildRequires:      tomcat6
 BuildRequires:      stringtemplate4
+BuildRequires:      stringtemplate
 BuildRequires:      felix-parent
 %if ! %{with_bootstrap}
 BuildRequires:      antlr3-tool >= 3.2
@@ -72,6 +73,7 @@ Group:       Development/Libraries
 Summary:     Java run-time support for ANTLR-generated parsers
 BuildArch:   noarch
 Requires:    stringtemplate4
+Requires:    stringtemplate
 Requires:    jpackage-utils
 Requires:    java >= 1:1.6.0
 
@@ -304,6 +306,9 @@ popd
 %{_datadir}/antlr/
 
 %changelog
+* Tue Jul 24 2012 Stanislav Ochotnicky <sochotnicky@redhat.com> - 3.4-8
+- Add back requires on stringtemplate for java subpackage
+
 * Wed Jul 18 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 3.4-7
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
 
