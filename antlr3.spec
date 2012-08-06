@@ -9,7 +9,7 @@
 Summary:            ANother Tool for Language Recognition
 Name:               antlr3
 Version:            %{antlr_version}
-Release:            8%{?dist}
+Release:            9%{?dist}
 URL:                http://www.antlr.org/
 Source0:            http://www.antlr.org/download/antlr-%{antlr_version}.tar.gz
 Source1:            http://www.antlr.org/download/C/libantlr3c-%{antlr_version}.tar.gz
@@ -21,6 +21,7 @@ Source6:            settings.xml
 Source7:            http://www.antlr.org/download/antlr-%{antlr_version}.jar
 Source8:            http://mirrors.ibiblio.org/pub/mirrors/maven2/org/antlr/antlr3-maven-plugin/%{antlr_version}/antlr3-maven-plugin-%{antlr_version}.jar
 %endif
+Source9:            antlr-runtime-MANIFEST.MF
 License:            BSD
 Group:              Development/Libraries
 BuildRequires:      java-devel >= 1:1.6.0
@@ -32,9 +33,8 @@ BuildRequires:      maven-assembly-plugin
 BuildRequires:      maven-shared-reporting-impl
 BuildRequires:      maven-surefire-provider-junit4
 BuildRequires:      buildnumber-maven-plugin
-BuildRequires:      junit4
-BuildRequires:      tomcat6-servlet-2.5-api
-BuildRequires:      tomcat6
+BuildRequires:      junit
+BuildRequires:      tomcat-servlet-3.0-api
 BuildRequires:      stringtemplate4
 BuildRequires:      stringtemplate
 BuildRequires:      felix-parent
@@ -207,6 +207,12 @@ doxygen -u # update doxygen configuration file
 doxygen # build doxygen documentation
 popd
 
+# inject OSGi manifests
+mkdir -p META-INF
+cp -p %{SOURCE9} META-INF/MANIFEST.MF
+touch META-INF/MANIFEST.MF
+zip -u runtime/Java/target/antlr-runtime-%{antlr_version}.jar META-INF/MANIFEST.MF
+
 %install
 mkdir -p $RPM_BUILD_ROOT{%{_javadir},%{_mavenpomdir},%{_bindir},%{_datadir}/antlr,%{_mandir}}
 
@@ -306,6 +312,10 @@ popd
 %{_datadir}/antlr/
 
 %changelog
+* Mon Aug 6 2012 Alexander Kurtakov <akurtako@redhat.com> 3.4-9
+- Inject org.antlr.runtime OSGi metadata.
+- Update BRs to newer versions.
+
 * Tue Jul 24 2012 Stanislav Ochotnicky <sochotnicky@redhat.com> - 3.4-8
 - Add back requires on stringtemplate for java subpackage
 
