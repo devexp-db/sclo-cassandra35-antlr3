@@ -38,6 +38,7 @@ BuildRequires:      tomcat-servlet-3.0-api
 BuildRequires:      stringtemplate4
 BuildRequires:      stringtemplate
 BuildRequires:      felix-parent
+BuildRequires:      zip
 %if ! %{with_bootstrap}
 BuildRequires:      antlr3-tool >= 3.2
 %endif
