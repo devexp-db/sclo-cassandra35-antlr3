@@ -9,7 +9,7 @@
 Summary:            ANother Tool for Language Recognition
 Name:               antlr3
 Version:            %{antlr_version}
-Release:            9%{?dist}
+Release:            10%{?dist}
 URL:                http://www.antlr.org/
 Source0:            http://www.antlr.org/download/antlr-%{antlr_version}.tar.gz
 Source1:            http://www.antlr.org/download/C/libantlr3c-%{antlr_version}.tar.gz
@@ -176,9 +176,9 @@ cp %{SOURCE8} $MAVEN_REPO_LOCAL/org.antlr/antlr3-maven-plugin.jar
 
 # Build antlr
 %if %{with_bootstrap}
-mvn-rpmbuild -s $(pwd)/settings.xml -Dmaven.repo.local=$MAVEN_REPO_LOCAL -Dmaven.test.skip=true install
+mvn-rpmbuild -s $(pwd)/settings.xml -Dmaven.repo.local=$MAVEN_REPO_LOCAL -Dmaven.test.skip=true -Dmaven.compile.target=1.5 install
 %else
-mvn-rpmbuild -Dmaven.repo.local=$MAVEN_REPO_LOCAL -Dmaven.test.skip=true install
+mvn-rpmbuild -Dmaven.repo.local=$MAVEN_REPO_LOCAL -Dmaven.test.skip=true -Dmaven.compile.target=1.5 install
 %endif
 
 # Build the plugin
@@ -313,6 +313,9 @@ popd
 %{_datadir}/antlr/
 
 %changelog
+* Sat Aug 18 2012 Miloš Jakubíček <xjakub@fi.muni.cz> - 3.4-10
+- Explicitly compile for Java 1.5, to (maybe?) fix BZ#842572
+
 * Mon Aug 6 2012 Alexander Kurtakov <akurtako@redhat.com> 3.4-9
 - Inject org.antlr.runtime OSGi metadata.
 - Update BRs to newer versions.
