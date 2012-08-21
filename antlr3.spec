@@ -9,7 +9,7 @@
 Summary:            ANother Tool for Language Recognition
 Name:               antlr3
 Version:            %{antlr_version}
-Release:            10%{?dist}
+Release:            11%{?dist}
 URL:                http://www.antlr.org/
 Source0:            http://www.antlr.org/download/antlr-%{antlr_version}.tar.gz
 Source1:            http://www.antlr.org/download/C/libantlr3c-%{antlr_version}.tar.gz
@@ -140,6 +140,15 @@ sed -i 's:<module>antlr3-maven-archetype</module>::' pom.xml
 sed -i 's:<module>gunit</module>::' pom.xml
 sed -i 's:<module>gunit-maven-plugin</module>::' pom.xml
 
+# compile for target 1.6, see BZ#842572
+sed -i 's/jsr14/1.6/' antlr3-maven-archetype/src/main/resources/archetype-resources/pom.xml \
+                      antlr3-maven-plugin/pom.xml \
+					  gunit/pom.xml \
+					  gunit-maven-plugin/pom.xml \
+					  pom.xml \
+					  runtime/Java/pom.xml \
+					  tool/pom.xml
+
 # remove corrupted files:
 rm antlr3-maven-plugin/src/main/java/org/antlr/mojo/antlr3/._*
 rm gunit-maven-plugin/src/main/java/org/antlr/mojo/antlr3/._GUnitExecuteMojo.java
@@ -176,15 +185,14 @@ cp %{SOURCE8} $MAVEN_REPO_LOCAL/org.antlr/antlr3-maven-plugin.jar
 
 # Build antlr
 %if %{with_bootstrap}
-mvn-rpmbuild -s $(pwd)/settings.xml -Dmaven.repo.local=$MAVEN_REPO_LOCAL -Dmaven.test.skip=true -Dmaven.compile.target=1.5 install
+mvn-rpmbuild -s $(pwd)/settings.xml -Dmaven.repo.local=$MAVEN_REPO_LOCAL -Dmaven.test.skip=true -Dmaven.compile.target=1.6 install
 %else
-mvn-rpmbuild -Dmaven.repo.local=$MAVEN_REPO_LOCAL -Dmaven.test.skip=true -Dmaven.compile.target=1.5 install
+mvn-rpmbuild -Dmaven.repo.local=$MAVEN_REPO_LOCAL -Dmaven.test.skip=true -Dmaven.compile.target=1.6 install
 %endif
 
 # Build the plugin
 pushd antlr3-maven-plugin
-mvn-rpmbuild -Dmaven.repo.local=$MAVEN_REPO_LOCAL \
-             install javadoc:javadoc
+mvn-rpmbuild -Dmaven.repo.local=$MAVEN_REPO_LOCAL -Dmaven.compile.target=1.6 install javadoc:javadoc
 popd
 
 ## Build the python runtime
@@ -313,7 +321,10 @@ popd
 %{_datadir}/antlr/
 
 %changelog
-* Sat Aug 18 2012 Miloš Jakubíček <xjakub@fi.muni.cz> - 3.4-10
+* Tue Aug 21 2012 Miloš Jakubíček <xjakub@fi.muni.cz> - 3.4-11
+- Now really compile for Java 1.6 everything
+
+ *Sat Aug 18 2012 Miloš Jakubíček <xjakub@fi.muni.cz> - 3.4-10
 - Explicitly compile for Java 1.5, to (maybe?) fix BZ#842572
 
 * Mon Aug 6 2012 Alexander Kurtakov <akurtako@redhat.com> 3.4-9
