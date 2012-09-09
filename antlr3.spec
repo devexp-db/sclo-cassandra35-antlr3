@@ -9,7 +9,7 @@
 Summary:            ANother Tool for Language Recognition
 Name:               antlr3
 Version:            %{antlr_version}
-Release:            11%{?dist}
+Release:            12%{?dist}
 URL:                http://www.antlr.org/
 Source0:            http://www.antlr.org/download/antlr-%{antlr_version}.tar.gz
 Source1:            http://www.antlr.org/download/C/libantlr3c-%{antlr_version}.tar.gz
@@ -273,6 +273,7 @@ pushd api/man/man3
 for file in `ls -1 * | grep -vi "^antlr3"`; do
     mv $file antlr3-$file
 done
+sed -i -e 's,^\.so man3/pANTLR3,.so man3/antlr3-pANTLR3,' `grep -rl 'man3/pANTLR3' .`
 gzip *
 popd
 mv api/man/man3 $RPM_BUILD_ROOT%{_mandir}/
@@ -321,6 +322,9 @@ popd
 %{_datadir}/antlr/
 
 %changelog
+* Sun Sep 09 2012 Miloš Jakubíček <xjakub@fi.muni.cz> - 3.4-12
+- Fix wrong man page references (see BZ#855619)
+
 * Tue Aug 21 2012 Miloš Jakubíček <xjakub@fi.muni.cz> - 3.4-11
 - Now really compile for Java 1.6 everything
 
