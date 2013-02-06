@@ -9,7 +9,7 @@
 Summary:            ANother Tool for Language Recognition
 Name:               antlr3
 Version:            %{antlr_version}
-Release:            12%{?dist}
+Release:            13%{?dist}
 URL:                http://www.antlr.org/
 Source0:            http://www.antlr.org/download/antlr-%{antlr_version}.tar.gz
 Source1:            http://www.antlr.org/download/C/libantlr3c-%{antlr_version}.tar.gz
@@ -26,7 +26,7 @@ License:            BSD
 Group:              Development/Libraries
 BuildRequires:      java-devel >= 1:1.6.0
 BuildRequires:      jpackage-utils
-BuildRequires:      maven
+BuildRequires:      maven-local
 BuildRequires:      maven-enforcer-plugin
 BuildRequires:      maven-plugin-bundle
 BuildRequires:      maven-assembly-plugin
@@ -322,6 +322,10 @@ popd
 %{_datadir}/antlr/
 
 %changelog
+* Wed Feb 06 2013 Java SIG <java-devel@lists.fedoraproject.org> - 3.4-13
+- Update for https://fedoraproject.org/wiki/Fedora_19_Maven_Rebuild
+- Replace maven BuildRequires with maven-local
+
 * Sun Sep 09 2012 Miloš Jakubíček <xjakub@fi.muni.cz> - 3.4-12
 - Fix wrong man page references (see BZ#855619)
 
