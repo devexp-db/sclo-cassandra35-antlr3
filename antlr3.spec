@@ -32,6 +32,7 @@ BuildRequires:      maven-plugin-bundle
 BuildRequires:      maven-assembly-plugin
 BuildRequires:      maven-shared-reporting-impl
 BuildRequires:      maven-surefire-provider-junit4
+BuildRequires:      maven-install-plugin
 BuildRequires:      buildnumber-maven-plugin
 BuildRequires:      junit
 BuildRequires:      tomcat-servlet-3.0-api
