@@ -9,7 +9,7 @@
 Summary:            ANother Tool for Language Recognition
 Name:               antlr3
 Version:            %{antlr_version}
-Release:            15%{?dist}
+Release:            16%{?dist}
 URL:                http://www.antlr.org/
 Source0:            http://www.antlr.org/download/antlr-%{antlr_version}.tar.gz
 Source1:            http://www.antlr.org/download/C/libantlr3c-%{antlr_version}.tar.gz
@@ -58,7 +58,7 @@ Group:       Development/Libraries
 Summary:     ANother Tool for Language Recognition
 BuildArch:   noarch
 Requires:    jpackage-utils
-Requires:    java >= 1:1.6.0
+Requires:    java-headless >= 1:1.6.0
 Provides:    %{name} = %{antlr_version}-%{release}
 Obsoletes:   %{name} < %{antlr_version}-%{release}
 Requires:    %{name}-java = %{antlr_version}-%{release}
@@ -77,7 +77,7 @@ BuildArch:   noarch
 Requires:    stringtemplate4
 Requires:    stringtemplate
 Requires:    jpackage-utils
-Requires:    java >= 1:1.6.0
+Requires:    java-headless >= 1:1.6.0
 
 %description java
 Java run-time support for ANTLR-generated parsers
@@ -323,6 +323,9 @@ popd
 %{_datadir}/antlr/
 
 %changelog
+* Tue Mar 04 2014 Stanislav Ochotnicky <sochotnicky@redhat.com> - 3.4-16
+- Use Requires: java-headless rebuild (#1067528)
+
 * Sat Aug 03 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 3.4-15
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_20_Mass_Rebuild
 
