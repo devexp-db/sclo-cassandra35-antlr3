@@ -1,19 +1,21 @@
 #%{!?python_sitelib: %global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")}
 
-%global antlr_version 3.4
+%global antlr_version 3.5
+%global c_runtime_version 3.4
 #%global python_runtime_version 3.1.3
 %global javascript_runtime_version 3.1
 
 Summary:            ANother Tool for Language Recognition
 Name:               antlr3
 Version:            %{antlr_version}
-Release:            18%{?dist}
-URL:                http://www.antlr.org/
-Source0:            http://www.antlr.org/download/antlr-%{antlr_version}.tar.gz
-Source1:            http://www.antlr.org/download/C/libantlr3c-%{antlr_version}.tar.gz
-Source2:            http://www.antlr.org/download/Python/antlr_python_runtime-%{python_runtime_version}.tar.gz
-Source3:            http://www.antlr.org/download/antlr-javascript-runtime-%{javascript_runtime_version}.zip
+Release:            1%{?dist}
+URL:                http://www.antlr3.org/
+Source0:            http://www.antlr3.org/download/antlr-%{antlr_version}.tar.gz
+Source1:            http://www.antlr3.org/download/C/libantlr3c-%{c_runtime_version}.tar.gz
+#Source2:            http://www.antlr3.org/download/Python/antlr_python_runtime-%{python_runtime_version}.tar.gz
+Source3:            http://www.antlr3.org/download/antlr-javascript-runtime-%{javascript_runtime_version}.zip
 Source9:            antlr-runtime-MANIFEST.MF
+Patch1:             0001-java8-fix.patch
 License:            BSD
 BuildRequires:      maven-local
 BuildRequires:      maven-enforcer-plugin
@@ -69,13 +71,14 @@ Javascript run-time support for ANTLR-generated parsers
 
 %package   C
 Summary:   C run-time support for ANTLR-generated parsers
+Version:   %{c_runtime_version}
 
 %description C
 C run-time support for ANTLR-generated parsers
 
 %package   C-devel
 Summary:   Header files for the C bindings for ANTLR-generated parsers
-Requires:  %{name}-C = %{antlr_version}-%{release}
+Requires:  %{name}-C = %{c_runtime_version}-%{release}
 
 %description C-devel
 Header files for the C bindings for ANTLR-generated parsers
@@ -85,7 +88,7 @@ Summary:        API documentation for the C run-time support for ANTLR-generated
 BuildArch:      noarch
 BuildRequires:  graphviz
 BuildRequires:  doxygen
-Requires:       %{name}-C = %{antlr_version}-%{release}
+Requires:       %{name}-C = %{c_runtime_version}-%{release}
 
 %description    C-docs
 This package contains doxygen documentation with instruction
@@ -103,13 +106,25 @@ C run-time support for ANTLR-generated parsers.
 #%description    python
 #Python run-time support for ANTLR-generated parsers
 
+%package javadoc
+Summary:        API documentation for %{name}
+
+%description javadoc
+%{summary}.
+
+
 %prep
-%setup -q -n antlr-%{antlr_version} -a 1 -a 2 -a 3
+%setup -q -n antlr3-antlr-%{antlr_version} -a 1 -a 3
 sed -i "s,\${buildNumber},`cat %{_sysconfdir}/fedora-release` `date`," tool/src/main/resources/org/antlr/antlr.properties
+%patch1 -p1
 
 %pom_disable_module antlr3-maven-archetype
 %pom_disable_module gunit
 %pom_disable_module gunit-maven-plugin
+%pom_disable_module antlr-complete
+
+%pom_remove_plugin :maven-source-plugin
+%pom_remove_plugin :maven-javadoc-plugin
 
 # compile for target 1.6, see BZ#842572
 sed -i 's/jsr14/1.6/' antlr3-maven-archetype/src/main/resources/archetype-resources/pom.xml \
@@ -123,14 +138,12 @@ sed -i 's/jsr14/1.6/' antlr3-maven-archetype/src/main/resources/archetype-resour
 # remove corrupted files:
 find . -name '._*' -delete
 
-%pom_remove_plugin :maven-source-plugin antlr3-maven-plugin
-%pom_remove_plugin :maven-javadoc-plugin antlr3-maven-plugin
-%pom_remove_plugin :buildnumber-maven-plugin
-
-%pom_xpath_inject pom:parent '<relativePath>../../</relativePath>' runtime/Java
+%pom_xpath_remove pom:bootclasspath
 
 # workarounds bug in filtering (Mark invalid)
 %pom_xpath_remove pom:resource/pom:filtering
+
+%pom_xpath_set -r 'pom:source|pom:target' 1.6
 
 %mvn_package :antlr-runtime java
 %mvn_package : tool
@@ -140,7 +153,7 @@ find . -name '._*' -delete
 %mvn_file :antlr-maven-plugin antlr3-maven-plugin
 
 %build
-%mvn_build -f -j
+%mvn_build -f
 
 ## Build the python runtime
 #pushd antlr_python_runtime-%{python_runtime_version}
@@ -148,10 +161,10 @@ find . -name '._*' -delete
 #popd
 
 # Build the C runtime
-pushd libantlr3c-%{antlr_version}-beta4
+pushd libantlr3c-%{c_runtime_version}-beta4
 
 %configure --disable-abiflags --enable-debuginfo \
-%ifarch x86_64 ppc64 s390x sparc64
+%if 0%{?__isa_bits} == 64
     --enable-64bit
 %else
     %{nil}
@@ -185,7 +198,7 @@ mkdir -p $RPM_BUILD_ROOT/%{_datadir}/antlr
 #popd
 
 # install C runtime
-pushd libantlr3c-%{antlr_version}-beta4
+pushd libantlr3c-%{c_runtime_version}-beta4
 make DESTDIR=$RPM_BUILD_ROOT install
 rm $RPM_BUILD_ROOT%{_libdir}/libantlr3c.{a,la}
 pushd api/man/man3
@@ -209,7 +222,7 @@ popd
 %postun C -p /sbin/ldconfig
 
 %files tool -f .mfiles-tool
-%doc tool/{README.txt,LICENSE.txt,CHANGES.txt}
+%doc README.txt tool/{LICENSE.txt,CHANGES.txt}
 %{_bindir}/antlr3
 
 #%files python
@@ -226,7 +239,7 @@ popd
 %{_mandir}/man3/*
 
 %files C-docs
-%doc libantlr3c-%{antlr_version}-beta4/api/
+%doc libantlr3c-%{c_runtime_version}-beta4/api/
 
 %files java -f .mfiles-java
 %doc tool/LICENSE.txt
@@ -235,7 +248,13 @@ popd
 %doc tool/LICENSE.txt
 %{_datadir}/antlr/
 
+%files javadoc -f .mfiles-javadoc
+%doc tool/LICENSE.txt
+
 %changelog
+* Tue Jun 17 2014 Michael Simacek <msimacek@redhat.com> - 3.5-1
+- Update to upstream version 3.5
+
 * Tue Jun 17 2014 Michael Simacek <msimacek@redhat.com> - 3.4-18
 - Specfile cleanup
 
