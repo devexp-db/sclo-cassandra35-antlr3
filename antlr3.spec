@@ -1,7 +1,5 @@
 #%{!?python_sitelib: %global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")}
 
-%global with_bootstrap 0
-
 %global antlr_version 3.4
 #%global python_runtime_version 3.1.3
 %global javascript_runtime_version 3.1
@@ -9,29 +7,20 @@
 Summary:            ANother Tool for Language Recognition
 Name:               antlr3
 Version:            %{antlr_version}
-Release:            17%{?dist}
+Release:            18%{?dist}
 URL:                http://www.antlr.org/
 Source0:            http://www.antlr.org/download/antlr-%{antlr_version}.tar.gz
 Source1:            http://www.antlr.org/download/C/libantlr3c-%{antlr_version}.tar.gz
 Source2:            http://www.antlr.org/download/Python/antlr_python_runtime-%{python_runtime_version}.tar.gz
 Source3:            http://www.antlr.org/download/antlr-javascript-runtime-%{javascript_runtime_version}.zip
-Source5:            antlr3
-%if %{with_bootstrap}
-Source6:            settings.xml
-Source7:            http://www.antlr.org/download/antlr-%{antlr_version}.jar
-Source8:            http://mirrors.ibiblio.org/pub/mirrors/maven2/org/antlr/antlr3-maven-plugin/%{antlr_version}/antlr3-maven-plugin-%{antlr_version}.jar
-%endif
 Source9:            antlr-runtime-MANIFEST.MF
 License:            BSD
-Group:              Development/Libraries
-BuildRequires:      java-devel >= 1:1.6.0
-BuildRequires:      jpackage-utils
 BuildRequires:      maven-local
 BuildRequires:      maven-enforcer-plugin
 BuildRequires:      maven-plugin-bundle
 BuildRequires:      maven-assembly-plugin
 BuildRequires:      maven-shared-reporting-impl
-BuildRequires:      maven-surefire-provider-junit4
+BuildRequires:      maven-surefire-provider-junit
 BuildRequires:      maven-install-plugin
 BuildRequires:      buildnumber-maven-plugin
 BuildRequires:      junit
@@ -39,10 +28,7 @@ BuildRequires:      tomcat-servlet-3.0-api
 BuildRequires:      stringtemplate4
 BuildRequires:      stringtemplate
 BuildRequires:      felix-parent
-BuildRequires:      zip
-%if ! %{with_bootstrap}
-BuildRequires:      antlr3-tool >= 3.2
-%endif
+BuildRequires:      antlr3-tool
 
 # we don't build it now
 Obsoletes:       antlr3-gunit < 3.2-15
@@ -54,15 +40,11 @@ interpreters, compilers, and translators from grammatical
 descriptions containing actions in a variety of target languages.
 
 %package     tool
-Group:       Development/Libraries
 Summary:     ANother Tool for Language Recognition
 BuildArch:   noarch
-Requires:    jpackage-utils
-Requires:    java-headless >= 1:1.6.0
 Provides:    %{name} = %{antlr_version}-%{release}
 Obsoletes:   %{name} < %{antlr_version}-%{release}
 Requires:    %{name}-java = %{antlr_version}-%{release}
-Requires:    stringtemplate4
 
 %description tool
 ANother Tool for Language Recognition, is a language tool
@@ -71,19 +53,13 @@ interpreters, compilers, and translators from grammatical
 descriptions containing actions in a variety of target languages.
 
 %package     java
-Group:       Development/Libraries
 Summary:     Java run-time support for ANTLR-generated parsers
 BuildArch:   noarch
-Requires:    stringtemplate4
-Requires:    stringtemplate
-Requires:    jpackage-utils
-Requires:    java-headless >= 1:1.6.0
 
 %description java
 Java run-time support for ANTLR-generated parsers
 
 %package      javascript
-Group:        Development/Libraries
 Summary:      Javascript run-time support for ANTLR-generated parsers
 Version:      %{javascript_runtime_version}
 BuildArch:    noarch
@@ -92,14 +68,12 @@ BuildArch:    noarch
 Javascript run-time support for ANTLR-generated parsers
 
 %package   C
-Group:     Development/Libraries
 Summary:   C run-time support for ANTLR-generated parsers
 
 %description C
 C run-time support for ANTLR-generated parsers
 
 %package   C-devel
-Group:     Development/Libraries
 Summary:   Header files for the C bindings for ANTLR-generated parsers
 Requires:  %{name}-C = %{antlr_version}-%{release}
 
@@ -107,7 +81,6 @@ Requires:  %{name}-C = %{antlr_version}-%{release}
 Header files for the C bindings for ANTLR-generated parsers
 
 %package        C-docs
-Group:          Documentation
 Summary:        API documentation for the C run-time support for ANTLR-generated parsers
 BuildArch:      noarch
 BuildRequires:  graphviz
@@ -132,14 +105,11 @@ C run-time support for ANTLR-generated parsers.
 
 %prep
 %setup -q -n antlr-%{antlr_version} -a 1 -a 2 -a 3
-%if %{with_bootstrap}
-cp %{SOURCE6} settings.xml
-%endif
 sed -i "s,\${buildNumber},`cat %{_sysconfdir}/fedora-release` `date`," tool/src/main/resources/org/antlr/antlr.properties
 
-sed -i 's:<module>antlr3-maven-archetype</module>::' pom.xml
-sed -i 's:<module>gunit</module>::' pom.xml
-sed -i 's:<module>gunit-maven-plugin</module>::' pom.xml
+%pom_disable_module antlr3-maven-archetype
+%pom_disable_module gunit
+%pom_disable_module gunit-maven-plugin
 
 # compile for target 1.6, see BZ#842572
 sed -i 's/jsr14/1.6/' antlr3-maven-archetype/src/main/resources/archetype-resources/pom.xml \
@@ -151,50 +121,26 @@ sed -i 's/jsr14/1.6/' antlr3-maven-archetype/src/main/resources/archetype-resour
 					  tool/pom.xml
 
 # remove corrupted files:
-rm antlr3-maven-plugin/src/main/java/org/antlr/mojo/antlr3/._*
-rm gunit-maven-plugin/src/main/java/org/antlr/mojo/antlr3/._GUnitExecuteMojo.java
+find . -name '._*' -delete
 
+%pom_remove_plugin :maven-source-plugin antlr3-maven-plugin
+%pom_remove_plugin :maven-javadoc-plugin antlr3-maven-plugin
+%pom_remove_plugin :buildnumber-maven-plugin
+
+%pom_xpath_inject pom:parent '<relativePath>../../</relativePath>' runtime/Java
+
+# workarounds bug in filtering (Mark invalid)
+%pom_xpath_remove pom:resource/pom:filtering
+
+%mvn_package :antlr-runtime java
+%mvn_package : tool
+
+%mvn_file :antlr antlr3
+%mvn_file :antlr-runtime antlr3-runtime
+%mvn_file :antlr-maven-plugin antlr3-maven-plugin
 
 %build
-
-export MAVEN_REPO_LOCAL=$(pwd)/.m2/repository
-mkdir -p $MAVEN_REPO_LOCAL
-
-%if %{with_bootstrap}
-# we need antlr3-maven-plugin in place
-sed -i -e \
-"s|<url>__JPP_URL_PLACEHOLDER__</url>|<url>file://`pwd`/.m2/repository</url>|g" \
-  settings.xml
-  sed -i -e \
-  "s|<url>__JAVADIR_PLACEHOLDER__</url>|<url>file://`pwd`/external_repo</url>|g" \
-  settings.xml
-  sed -i -e \
-  "s|<url>__MAVENREPO_DIR_PLACEHOLDER__</url>|<url>file://`pwd`/.m2/repository</url>|g" \
-  settings.xml
-  sed -i -e \
-  "s|<url>__MAVENDIR_PLUGIN_PLACEHOLDER__</url>|<url>file:///usr/share/maven2/plugins</url>|g" \
-  settings.xml
-
-mkdir -p $MAVEN_REPO_LOCAL/JPP/maven2/default_poms/
-mkdir -p $MAVEN_REPO_LOCAL/org.antlr/
-cp antlr3-maven-plugin/pom.xml $MAVEN_REPO_LOCAL/JPP/maven2/default_poms/JPP-antlr3-maven-plugin.pom
-# install prebuilt antlr and antlr3-maven-plugin into repository
-# Man, this is hackish. Hold your nose.
-cp %{SOURCE7} $MAVEN_REPO_LOCAL/org.antlr/antlr.jar
-cp %{SOURCE8} $MAVEN_REPO_LOCAL/org.antlr/antlr3-maven-plugin.jar
-%endif
-
-# Build antlr
-%if %{with_bootstrap}
-mvn-rpmbuild -s $(pwd)/settings.xml -Dmaven.repo.local=$MAVEN_REPO_LOCAL -Dmaven.test.skip=true -Dmaven.compile.target=1.6 install
-%else
-mvn-rpmbuild -Dmaven.repo.local=$MAVEN_REPO_LOCAL -Dmaven.test.skip=true -Dmaven.compile.target=1.6 install
-%endif
-
-# Build the plugin
-pushd antlr3-maven-plugin
-mvn-rpmbuild -Dmaven.repo.local=$MAVEN_REPO_LOCAL -Dmaven.compile.target=1.6 install javadoc:javadoc
-popd
+%mvn_build -f -j
 
 ## Build the python runtime
 #pushd antlr_python_runtime-%{python_runtime_version}
@@ -224,41 +170,13 @@ touch META-INF/MANIFEST.MF
 zip -u runtime/Java/target/antlr-runtime-%{antlr_version}.jar META-INF/MANIFEST.MF
 
 %install
-mkdir -p $RPM_BUILD_ROOT{%{_javadir},%{_mavenpomdir},%{_bindir},%{_datadir}/antlr,%{_mandir}}
+mkdir -p $RPM_BUILD_ROOT/%{_mandir}
+mkdir -p $RPM_BUILD_ROOT/%{_datadir}/antlr
 
-# install maven POMs
-install -pm 644 pom.xml $RPM_BUILD_ROOT/%{_mavenpomdir}/JPP-antlr3-master.pom
-%add_maven_depmap JPP-antlr3-master.pom
-
-install -pm 644 runtime/Java/pom.xml $RPM_BUILD_ROOT/%{_mavenpomdir}/JPP-antlr3-runtime.pom
-install -pm 644 tool/pom.xml $RPM_BUILD_ROOT/%{_mavenpomdir}/JPP-antlr3.pom
-install -pm 644 antlr3-maven-plugin/pom.xml $RPM_BUILD_ROOT/%{_mavenpomdir}/JPP-antlr3-maven-plugin.pom
-install -pm 644 gunit-maven-plugin/pom.xml $RPM_BUILD_ROOT/%{_mavenpomdir}/JPP-maven-gunit-plugin.pom
-
-# install jars
-install -m 644 runtime/Java/target/antlr-runtime-*.jar \
-        $RPM_BUILD_ROOT%{_datadir}/java/antlr3-runtime.jar
-%add_maven_depmap JPP-antlr3-runtime.pom antlr3-runtime.jar
-
-install -m 644 tool/target/antlr-*.jar \
-        $RPM_BUILD_ROOT%{_datadir}/java/antlr3.jar
-%add_maven_depmap JPP-antlr3.pom antlr3.jar
-
-install -m 644 antlr3-maven-plugin/target/%{name}-maven-plugin-%{antlr_version}.jar \
-        $RPM_BUILD_ROOT%{_datadir}/java/%{name}-maven-plugin.jar
-%add_maven_depmap JPP-%{name}-maven-plugin.pom %{name}-maven-plugin.jar
-
-# We disable gunit because it currently fails to build, maybe after upgrade?
-#install gunit/target/gunit-%{antlr_version}.jar \
-#        $RPM_BUILD_ROOT%{_datadir}/java/gunit.jar
-
-#install -m 644 gunit-maven-plugin/target/maven-gunit-plugin-%{antlr_version}.jar \
-#        $RPM_BUILD_ROOT%{_datadir}/java/maven-gunit-plugin.jar
-#%%add_maven_depmap JPP-maven-gunit-plugin.pom maven-gunit.plugin.jar
-
+%mvn_install
 
 # install wrapper script
-install -m 755 %{SOURCE5} $RPM_BUILD_ROOT%{_bindir}/antlr3
+%jpackage_script org.antlr.Tool '' '' 'stringtemplate4.jar:antlr3.jar:antlr3-runtime.jar' antlr3 true
 
 ## install python runtime
 #pushd antlr_python_runtime-%{python_runtime_version}
@@ -290,10 +208,8 @@ popd
 
 %postun C -p /sbin/ldconfig
 
-%files tool
+%files tool -f .mfiles-tool
 %doc tool/{README.txt,LICENSE.txt,CHANGES.txt}
-%{_javadir}/antlr3.jar
-%{_javadir}/antlr3-maven*.jar
 %{_bindir}/antlr3
 
 #%files python
@@ -312,17 +228,17 @@ popd
 %files C-docs
 %doc libantlr3c-%{antlr_version}-beta4/api/
 
-%files java
+%files java -f .mfiles-java
 %doc tool/LICENSE.txt
-%{_javadir}/*runtime*.jar
-%{_mavenpomdir}/*.pom
-%config %{_mavendepmapfragdir}/antlr3
 
 %files javascript
 %doc tool/LICENSE.txt
 %{_datadir}/antlr/
 
 %changelog
+* Tue Jun 17 2014 Michael Simacek <msimacek@redhat.com> - 3.4-18
+- Specfile cleanup
+
 * Sat Jun 07 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 3.4-17
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_21_Mass_Rebuild
 
