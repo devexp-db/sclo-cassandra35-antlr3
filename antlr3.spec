@@ -1,6 +1,6 @@
 #%{!?python_sitelib: %global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")}
 
-%global antlr_version 3.5
+%global antlr_version 3.5.2
 %global c_runtime_version 3.4
 #%global python_runtime_version 3.1.3
 %global javascript_runtime_version 3.1
@@ -10,8 +10,7 @@ Name:               antlr3
 Version:            %{antlr_version}
 Release:            1%{?dist}
 URL:                http://www.antlr3.org/
-Source0:            http://www.antlr3.org/download/antlr-%{antlr_version}.tar.gz
-Source1:            http://www.antlr3.org/download/C/libantlr3c-%{c_runtime_version}.tar.gz
+Source0:            https://github.com/antlr/antlr3/archive/%{antlr_version}.tar.gz
 #Source2:            http://www.antlr3.org/download/Python/antlr_python_runtime-%{python_runtime_version}.tar.gz
 Source3:            http://www.antlr3.org/download/antlr-javascript-runtime-%{javascript_runtime_version}.zip
 Source9:            antlr-runtime-MANIFEST.MF
@@ -31,6 +30,7 @@ BuildRequires:      stringtemplate4
 BuildRequires:      stringtemplate
 BuildRequires:      felix-parent
 BuildRequires:      antlr3-tool
+BuildRequires:      autoconf
 
 # we don't build it now
 Obsoletes:       antlr3-gunit < 3.2-15
@@ -95,6 +95,12 @@ This package contains doxygen documentation with instruction
 on how to use the C target in ANTLR and complete API description of the
 C run-time support for ANTLR-generated parsers.
 
+%package C++-devel
+Summary:        C++ runtime support for ANTLR-generated parsers
+
+%description C++-devel
+C++ runtime support for ANTLR-generated parsers.
+
 #%package        python
 #Group:          Development/Libraries
 #Summary:        Python run-time support for ANTLR-generated parsers
@@ -108,13 +114,14 @@ C run-time support for ANTLR-generated parsers.
 
 %package javadoc
 Summary:        API documentation for %{name}
+BuildArch:      noarch
 
 %description javadoc
 %{summary}.
 
 
 %prep
-%setup -q -n antlr3-antlr-%{antlr_version} -a 1 -a 3
+%setup -q -n antlr3-%{antlr_version} -a 3
 sed -i "s,\${buildNumber},`cat %{_sysconfdir}/fedora-release` `date`," tool/src/main/resources/org/antlr/antlr.properties
 %patch1 -p1
 
@@ -129,21 +136,14 @@ sed -i "s,\${buildNumber},`cat %{_sysconfdir}/fedora-release` `date`," tool/src/
 # compile for target 1.6, see BZ#842572
 sed -i 's/jsr14/1.6/' antlr3-maven-archetype/src/main/resources/archetype-resources/pom.xml \
                       antlr3-maven-plugin/pom.xml \
-					  gunit/pom.xml \
-					  gunit-maven-plugin/pom.xml \
-					  pom.xml \
-					  runtime/Java/pom.xml \
-					  tool/pom.xml
-
-# remove corrupted files:
-find . -name '._*' -delete
-
-%pom_xpath_remove pom:bootclasspath
+                                          gunit/pom.xml \
+                                          gunit-maven-plugin/pom.xml \
+                                          pom.xml \
+                                          runtime/Java/pom.xml \
+                                          tool/pom.xml
 
 # workarounds bug in filtering (Mark invalid)
 %pom_xpath_remove pom:resource/pom:filtering
-
-%pom_xpath_set -r 'pom:source|pom:target' 1.6
 
 %mvn_package :antlr-runtime java
 %mvn_package : tool
@@ -161,8 +161,8 @@ find . -name '._*' -delete
 #popd
 
 # Build the C runtime
-pushd libantlr3c-%{c_runtime_version}-beta4
-
+pushd runtime/C
+autoreconf -i
 %configure --disable-abiflags --enable-debuginfo \
 %if 0%{?__isa_bits} == 64
     --enable-64bit
@@ -175,6 +175,8 @@ make %{?_smp_mflags}
 doxygen -u # update doxygen configuration file
 doxygen # build doxygen documentation
 popd
+
+
 
 # inject OSGi manifests
 mkdir -p META-INF
@@ -198,7 +200,7 @@ mkdir -p $RPM_BUILD_ROOT/%{_datadir}/antlr
 #popd
 
 # install C runtime
-pushd libantlr3c-%{c_runtime_version}-beta4
+pushd runtime/C
 make DESTDIR=$RPM_BUILD_ROOT install
 rm $RPM_BUILD_ROOT%{_libdir}/libantlr3c.{a,la}
 pushd api/man/man3
@@ -216,6 +218,10 @@ popd
 pushd antlr-javascript-runtime-%{javascript_runtime_version}
 install -pm 644 *.js $RPM_BUILD_ROOT%{_datadir}/antlr/
 popd
+
+# install C++ runtime (header only)
+mkdir -p $RPM_BUILD_ROOT/%{_includedir}/%{name}
+install -pm 644 runtime/Cpp/include/* $RPM_BUILD_ROOT/%{_includedir}/
 
 %post C -p /sbin/ldconfig
 
@@ -235,11 +241,16 @@ popd
 %{_libdir}/libantlr3c.so
 
 %files C-devel
-%{_includedir}/antlr3*
 %{_mandir}/man3/*
+%{_includedir}/*.h
 
 %files C-docs
-%doc libantlr3c-%{c_runtime_version}-beta4/api/
+%doc runtime/C/api
+
+%files C++-devel
+%doc tool/LICENSE.txt
+%{_includedir}/*.hpp
+%{_includedir}/*.inl
 
 %files java -f .mfiles-java
 %doc tool/LICENSE.txt
@@ -252,6 +263,11 @@ popd
 %doc tool/LICENSE.txt
 
 %changelog
+* Wed Jun 18 2014 Michael Simacek <msimacek@redhat.com> - 3.5.2-1
+- Update to upstream version 3.5.2
+- Build the C runtime from main tarball
+- Make C++-devel subpackage
+
 * Tue Jun 17 2014 Michael Simacek <msimacek@redhat.com> - 3.5-1
 - Update to upstream version 3.5
 
