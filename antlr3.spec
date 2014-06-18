@@ -4,11 +4,13 @@
 %global c_runtime_version 3.4
 #%global python_runtime_version 3.1.3
 %global javascript_runtime_version 3.1
+%global baserelease 1
 
 Summary:            ANother Tool for Language Recognition
 Name:               antlr3
 Version:            %{antlr_version}
-Release:            1%{?dist}
+Release:            %{baserelease}%{?dist}
+Epoch:              1
 URL:                http://www.antlr3.org/
 Source0:            https://github.com/antlr/antlr3/archive/%{antlr_version}.tar.gz
 #Source2:            http://www.antlr3.org/download/Python/antlr_python_runtime-%{python_runtime_version}.tar.gz
@@ -61,9 +63,17 @@ BuildArch:   noarch
 %description java
 Java run-time support for ANTLR-generated parsers
 
+%package javadoc
+Summary:        API documentation for %{name}
+BuildArch:      noarch
+
+%description javadoc
+%{summary}.
+
 %package      javascript
 Summary:      Javascript run-time support for ANTLR-generated parsers
 Version:      %{javascript_runtime_version}
+Release:      %{antlr_version}.%{baserelease}
 BuildArch:    noarch
 
 %description  javascript
@@ -72,6 +82,7 @@ Javascript run-time support for ANTLR-generated parsers
 %package   C
 Summary:   C run-time support for ANTLR-generated parsers
 Version:   %{c_runtime_version}
+Release:      %{antlr_version}.%{baserelease}
 
 %description C
 C run-time support for ANTLR-generated parsers
@@ -79,6 +90,9 @@ C run-time support for ANTLR-generated parsers
 %package   C-devel
 Summary:   Header files for the C bindings for ANTLR-generated parsers
 Requires:  %{name}-C = %{c_runtime_version}-%{release}
+Version:   %{c_runtime_version}
+Release:      %{antlr_version}.%{baserelease}
+
 
 %description C-devel
 Header files for the C bindings for ANTLR-generated parsers
@@ -89,6 +103,8 @@ BuildArch:      noarch
 BuildRequires:  graphviz
 BuildRequires:  doxygen
 Requires:       %{name}-C = %{c_runtime_version}-%{release}
+Version:   %{c_runtime_version}
+Release:      %{antlr_version}.%{baserelease}
 
 %description    C-docs
 This package contains doxygen documentation with instruction
@@ -111,13 +127,6 @@ C++ runtime support for ANTLR-generated parsers.
 #
 #%description    python
 #Python run-time support for ANTLR-generated parsers
-
-%package javadoc
-Summary:        API documentation for %{name}
-BuildArch:      noarch
-
-%description javadoc
-%{summary}.
 
 
 %prep
