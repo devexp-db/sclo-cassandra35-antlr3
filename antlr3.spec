@@ -46,9 +46,9 @@ descriptions containing actions in a variety of target languages.
 %package     tool
 Summary:     ANother Tool for Language Recognition
 BuildArch:   noarch
-Provides:    %{name} = %{antlr_version}-%{release}
-Obsoletes:   %{name} < %{antlr_version}-%{release}
-Requires:    %{name}-java = %{antlr_version}-%{release}
+Provides:    %{name} = %{epoch}:%{antlr_version}-%{release}
+Obsoletes:   %{name} < %{epoch}:%{antlr_version}-%{release}
+Requires:    %{name}-java = %{epoch}:%{antlr_version}-%{release}
 
 %description tool
 ANother Tool for Language Recognition, is a language tool
@@ -89,7 +89,7 @@ C run-time support for ANTLR-generated parsers
 
 %package   C-devel
 Summary:   Header files for the C bindings for ANTLR-generated parsers
-Requires:  %{name}-C = %{c_runtime_version}-%{release}
+Requires:  %{name}-C = %{epoch}:%{c_runtime_version}-%{release}
 Version:   %{c_runtime_version}
 Release:      %{antlr_version}.%{baserelease}
 
@@ -102,7 +102,7 @@ Summary:        API documentation for the C run-time support for ANTLR-generated
 BuildArch:      noarch
 BuildRequires:  graphviz
 BuildRequires:  doxygen
-Requires:       %{name}-C = %{c_runtime_version}-%{release}
+Requires:       %{name}-C = %{epoch}:%{c_runtime_version}-%{release}
 Version:   %{c_runtime_version}
 Release:      %{antlr_version}.%{baserelease}
 
