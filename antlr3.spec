@@ -4,7 +4,7 @@
 %global c_runtime_version 3.4
 #%global python_runtime_version 3.1.3
 %global javascript_runtime_version 3.1
-%global baserelease 1
+%global baserelease 2
 
 Summary:            ANother Tool for Language Recognition
 Name:               antlr3
@@ -272,6 +272,9 @@ install -pm 644 runtime/Cpp/include/* $RPM_BUILD_ROOT/%{_includedir}/
 %doc tool/LICENSE.txt
 
 %changelog
+* Fri Aug 15 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1:3.5.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_21_22_Mass_Rebuild
+
 * Wed Jun 18 2014 Michael Simacek <msimacek@redhat.com> - 3.5.2-1
 - Update to upstream version 3.5.2
 - Build the C runtime from main tarball
