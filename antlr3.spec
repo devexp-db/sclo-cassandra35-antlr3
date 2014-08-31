@@ -4,7 +4,7 @@
 %global c_runtime_version 3.4
 #%global python_runtime_version 3.1.3
 %global javascript_runtime_version 3.1
-%global baserelease 2
+%global baserelease 3
 
 Summary:            ANother Tool for Language Recognition
 Name:               antlr3
@@ -73,7 +73,7 @@ BuildArch:      noarch
 %package      javascript
 Summary:      Javascript run-time support for ANTLR-generated parsers
 Version:      %{javascript_runtime_version}
-Release:      %{antlr_version}.%{baserelease}
+Release:      %{antlr_version}.%{baserelease}%{?dist}
 BuildArch:    noarch
 
 %description  javascript
@@ -82,7 +82,7 @@ Javascript run-time support for ANTLR-generated parsers
 %package   C
 Summary:   C run-time support for ANTLR-generated parsers
 Version:   %{c_runtime_version}
-Release:      %{antlr_version}.%{baserelease}
+Release:      %{antlr_version}.%{baserelease}%{?dist}
 
 %description C
 C run-time support for ANTLR-generated parsers
@@ -91,7 +91,7 @@ C run-time support for ANTLR-generated parsers
 Summary:   Header files for the C bindings for ANTLR-generated parsers
 Requires:  %{name}-C = %{epoch}:%{c_runtime_version}-%{release}
 Version:   %{c_runtime_version}
-Release:      %{antlr_version}.%{baserelease}
+Release:      %{antlr_version}.%{baserelease}%{?dist}
 
 
 %description C-devel
@@ -104,7 +104,7 @@ BuildRequires:  graphviz
 BuildRequires:  doxygen
 Requires:       %{name}-C = %{epoch}:%{c_runtime_version}-%{release}
 Version:   %{c_runtime_version}
-Release:      %{antlr_version}.%{baserelease}
+Release:      %{antlr_version}.%{baserelease}%{?dist}
 
 %description    C-docs
 This package contains doxygen documentation with instruction
@@ -272,6 +272,9 @@ install -pm 644 runtime/Cpp/include/* $RPM_BUILD_ROOT/%{_includedir}/
 %doc tool/LICENSE.txt
 
 %changelog
+* Sun Aug 31 2014 Till Maas <opensource@till.name> - 1:3.5.2-3
+- Add missing dist tags for subpackages
+
 * Fri Aug 15 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1:3.5.2-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_21_22_Mass_Rebuild
 
