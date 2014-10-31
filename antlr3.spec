@@ -4,7 +4,7 @@
 %global c_runtime_version 3.4
 #%global python_runtime_version 3.1.3
 %global javascript_runtime_version 3.1
-%global baserelease 3
+%global baserelease 4
 
 Summary:            ANother Tool for Language Recognition
 Name:               antlr3
@@ -191,7 +191,7 @@ popd
 mkdir -p META-INF
 cp -p %{SOURCE9} META-INF/MANIFEST.MF
 touch META-INF/MANIFEST.MF
-zip -u runtime/Java/target/antlr-runtime-%{antlr_version}.jar META-INF/MANIFEST.MF
+zip runtime/Java/target/antlr-runtime-%{antlr_version}.jar META-INF/MANIFEST.MF
 
 %install
 mkdir -p $RPM_BUILD_ROOT/%{_mandir}
@@ -272,6 +272,9 @@ install -pm 644 runtime/Cpp/include/* $RPM_BUILD_ROOT/%{_includedir}/
 %doc tool/LICENSE.txt
 
 %changelog
+* Fri Oct 31 2014 Yaakov Selkowitz <yselkowi@redhat.com> - 1:3.5.2-4
+- Avoid timestamp conflicts when updating jar manifest
+
 * Sun Aug 31 2014 Till Maas <opensource@till.name> - 1:3.5.2-3
 - Add missing dist tags for subpackages
 
