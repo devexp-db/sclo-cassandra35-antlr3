@@ -4,7 +4,7 @@
 %global c_runtime_version 3.4
 #%global python_runtime_version 3.1.3
 %global javascript_runtime_version 3.1
-%global baserelease 4
+%global baserelease 5
 
 Summary:            ANother Tool for Language Recognition
 Name:               antlr3
@@ -32,7 +32,7 @@ BuildRequires:      stringtemplate4
 BuildRequires:      stringtemplate
 BuildRequires:      felix-parent
 BuildRequires:      antlr3-tool
-BuildRequires:      autoconf
+BuildRequires:      autoconf automake libtool
 
 # we don't build it now
 Obsoletes:       antlr3-gunit < 3.2-15
@@ -272,6 +272,9 @@ install -pm 644 runtime/Cpp/include/* $RPM_BUILD_ROOT/%{_includedir}/
 %doc tool/LICENSE.txt
 
 %changelog
+* Mon Mar 23 2015 Dan Horák <dan[at]danny.cz> - 1:3.5.2-5
+- update BR - whole autotools chain is required explicitly
+
 * Fri Oct 31 2014 Yaakov Selkowitz <yselkowi@redhat.com> - 1:3.5.2-4
 - Avoid timestamp conflicts when updating jar manifest
 
