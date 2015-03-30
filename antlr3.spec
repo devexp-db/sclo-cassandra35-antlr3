@@ -4,7 +4,7 @@
 %global c_runtime_version 3.4
 #%global python_runtime_version 3.1.3
 %global javascript_runtime_version 3.1
-%global baserelease 5
+%global baserelease 6
 
 Summary:            ANother Tool for Language Recognition
 Name:               antlr3
@@ -18,21 +18,18 @@ Source3:            http://www.antlr3.org/download/antlr-javascript-runtime-%{ja
 Source9:            antlr-runtime-MANIFEST.MF
 Patch1:             0001-java8-fix.patch
 License:            BSD
+
 BuildRequires:      maven-local
-BuildRequires:      maven-enforcer-plugin
 BuildRequires:      maven-plugin-bundle
-BuildRequires:      maven-assembly-plugin
-BuildRequires:      maven-shared-reporting-impl
 BuildRequires:      maven-surefire-provider-junit
-BuildRequires:      maven-install-plugin
-BuildRequires:      buildnumber-maven-plugin
 BuildRequires:      junit
-BuildRequires:      tomcat-servlet-3.0-api
 BuildRequires:      stringtemplate4
 BuildRequires:      stringtemplate
-BuildRequires:      felix-parent
 BuildRequires:      antlr3-tool
-BuildRequires:      autoconf automake libtool
+
+BuildRequires:      autoconf
+BuildRequires:      automake
+BuildRequires:      libtool
 
 # we don't build it now
 Obsoletes:       antlr3-gunit < 3.2-15
@@ -179,7 +176,7 @@ autoreconf -i
     %{nil}
 %endif
 
-sed -i "s/CFLAGS = .*/CFLAGS = $RPM_OPT_FLAGS/" Makefile
+sed -i "s#CFLAGS = .*#CFLAGS = $RPM_OPT_FLAGS#" Makefile
 make %{?_smp_mflags}
 doxygen -u # update doxygen configuration file
 doxygen # build doxygen documentation
@@ -272,6 +269,9 @@ install -pm 644 runtime/Cpp/include/* $RPM_BUILD_ROOT/%{_includedir}/
 %doc tool/LICENSE.txt
 
 %changelog
+* Mon Mar 30 2015 Michael Simacek <msimacek@redhat.com> - 1:3.5.2-6
+- Fix FTBFS
+
 * Mon Mar 23 2015 Dan Horák <dan[at]danny.cz> - 1:3.5.2-5
 - update BR - whole autotools chain is required explicitly
 
