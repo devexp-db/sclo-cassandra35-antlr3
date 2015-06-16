@@ -4,7 +4,7 @@
 %global c_runtime_version 3.4
 #%global python_runtime_version 3.1.3
 %global javascript_runtime_version 3.1
-%global baserelease 7
+%global baserelease 8
 
 Summary:            ANother Tool for Language Recognition
 Name:               antlr3
@@ -270,6 +270,9 @@ install -pm 644 runtime/Cpp/include/* $RPM_BUILD_ROOT/%{_includedir}/
 %doc tool/LICENSE.txt
 
 %changelog
+* Tue Jun 16 2015 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1:3.5.2-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_23_Mass_Rebuild
+
 * Wed Apr 29 2015 Michal Srb <msrb@redhat.com> - 1:3.5.2-7
 - Fix FTBFS (Resolves: rhbz#1204672)
 
