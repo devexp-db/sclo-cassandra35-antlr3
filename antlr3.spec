@@ -1,10 +1,7 @@
-#%{!?python_sitelib: %global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")}
-
 %global antlr_version 3.5.2
 %global c_runtime_version 3.4
-#%global python_runtime_version 3.1.3
 %global javascript_runtime_version 3.1
-%global baserelease 9
+%global baserelease 10
 
 Summary:            ANother Tool for Language Recognition
 Name:               antlr3
@@ -15,8 +12,11 @@ URL:                http://www.antlr3.org/
 Source0:            https://github.com/antlr/antlr3/archive/%{antlr_version}.tar.gz
 #Source2:            http://www.antlr3.org/download/Python/antlr_python_runtime-%{python_runtime_version}.tar.gz
 Source3:            http://www.antlr3.org/download/antlr-javascript-runtime-%{javascript_runtime_version}.zip
-Source9:            antlr-runtime-MANIFEST.MF
-Patch1:             0001-java8-fix.patch
+Patch0:             0001-java8-fix.patch
+
+# Generate OSGi metadata
+Patch1:         osgi-manifest.patch
+
 License:            BSD
 
 BuildRequires:      maven-local
@@ -118,22 +118,11 @@ Summary:        C++ runtime support for ANTLR-generated parsers
 %description C++-devel
 C++ runtime support for ANTLR-generated parsers.
 
-#%package        python
-#Group:          Development/Libraries
-#Summary:        Python run-time support for ANTLR-generated parsers
-#BuildRequires:  python-devel
-#BuildRequires:  python-setuptools-devel
-#BuildArch:      noarch
-#Version:        %{python_runtime_version}
-#
-#%description    python
-#Python run-time support for ANTLR-generated parsers
-
-
 %prep
 %setup -q -n antlr3-%{antlr_version} -a 3
 sed -i "s,\${buildNumber},`cat %{_sysconfdir}/fedora-release` `date`," tool/src/main/resources/org/antlr/antlr.properties
-%patch1 -p1
+%patch0 -p1
+%patch1
 
 # remove pre-built artifacts
 find -type f -a -name *.jar -delete
@@ -169,11 +158,6 @@ sed -i 's/jsr14/1.6/' antlr3-maven-archetype/src/main/resources/archetype-resour
 %build
 %mvn_build -f
 
-## Build the python runtime
-#pushd antlr_python_runtime-%{python_runtime_version}
-#%{__python} setup.py build
-#popd
-
 # Build the C runtime
 pushd runtime/C
 autoreconf -i
@@ -199,12 +183,6 @@ jar cvf ant-antlr3.jar \
   -C antlr3-src org/apache/tools/ant/antlr/ANTLR3.class
 popd
 
-# inject OSGi manifests
-mkdir -p META-INF
-cp -p %{SOURCE9} META-INF/MANIFEST.MF
-touch META-INF/MANIFEST.MF
-zip runtime/Java/target/antlr-runtime-%{antlr_version}.jar META-INF/MANIFEST.MF
-
 %install
 mkdir -p $RPM_BUILD_ROOT/%{_mandir}
 mkdir -p $RPM_BUILD_ROOT/%{_datadir}/antlr
@@ -220,12 +198,6 @@ EOF
 
 # install wrapper script
 %jpackage_script org.antlr.Tool '' '' 'stringtemplate4.jar:antlr3.jar:antlr3-runtime.jar' antlr3 true
-
-## install python runtime
-#pushd antlr_python_runtime-%{python_runtime_version}
-#%{__python} setup.py install -O1 --skip-build --root $RPM_BUILD_ROOT
-#chmod a+x $RPM_BUILD_ROOT%{python_sitelib}/antlr_python_runtime-*
-#popd
 
 # install C runtime
 pushd runtime/C
@@ -261,11 +233,6 @@ install -pm 644 runtime/Cpp/include/* $RPM_BUILD_ROOT/%{_includedir}/
 %{_javadir}/ant/ant-antlr3.jar
 %config(noreplace) %{_sysconfdir}/ant.d/ant-antlr3
 
-#%files python
-#%doc tool/LICENSE.txt
-#%{python_sitelib}/antlr3/*
-#%{python_sitelib}/antlr_python_runtime-*
-
 %files C
 %doc tool/LICENSE.txt
 %{_libdir}/libantlr3c.so
@@ -293,6 +260,10 @@ install -pm 644 runtime/Cpp/include/* $RPM_BUILD_ROOT/%{_includedir}/
 %doc tool/LICENSE.txt
 
 %changelog
+* Tue Nov 24 2015 Mat Booth <mat.booth@redhat.com> - 1:3.5.2-10
+- Fix OSGi metadata
+- Delete some commented out sections
+
 * Wed Jun 17 2015 Mat Booth <mat.booth@redhat.com> - 1:3.5.2-9
 - Build and ship the antlr3 ant task
 - Add provides/obsoletes for separate ant-antlr3 package
