@@ -1,7 +1,7 @@
 %global antlr_version 3.5.2
 %global c_runtime_version 3.4
 %global javascript_runtime_version 3.1
-%global baserelease 10
+%global baserelease 11
 
 Summary:            ANother Tool for Language Recognition
 Name:               antlr3
@@ -260,6 +260,9 @@ install -pm 644 runtime/Cpp/include/* $RPM_BUILD_ROOT/%{_includedir}/
 %doc tool/LICENSE.txt
 
 %changelog
+* Wed Feb 03 2016 Fedora Release Engineering <releng@fedoraproject.org> - 1:3.5.2-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_24_Mass_Rebuild
+
 * Tue Nov 24 2015 Mat Booth <mat.booth@redhat.com> - 1:3.5.2-10
 - Fix OSGi metadata
 - Delete some commented out sections
