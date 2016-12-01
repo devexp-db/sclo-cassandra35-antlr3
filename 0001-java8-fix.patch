@@ -1,4 +1,4 @@
-From d0aa3d0a4f323cb1464c02d53711c2a0cd24c10d Mon Sep 17 00:00:00 2001
+From 33f662c60e6e7b703e197854d2478a8747f044f0 Mon Sep 17 00:00:00 2001
 From: Michael Simacek <msimacek@redhat.com>
 Date: Tue, 17 Jun 2014 19:36:24 +0200
 Subject: [PATCH] java8 fix
@@ -6,13 +6,12 @@ Subject: [PATCH] java8 fix
 Signed-off-by: Michael Simacek <msimacek@redhat.com>
 ---
  tool/src/main/java/org/antlr/codegen/CodeGenerator.java | 2 +-
- tool/src/main/java/org/antlr/tool/ErrorManager.java     | 1 -
  tool/src/main/java/org/antlr/tool/Grammar.java          | 4 ++--
  tool/src/main/java/org/antlr/tool/Strip.java            | 2 +-
- 4 files changed, 4 insertions(+), 5 deletions(-)
+ 3 files changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/tool/src/main/java/org/antlr/codegen/CodeGenerator.java b/tool/src/main/java/org/antlr/codegen/CodeGenerator.java
-index 57495b2..eada38e 100644
+index b279bd5..566e33c 100644
 --- a/tool/src/main/java/org/antlr/codegen/CodeGenerator.java
 +++ b/tool/src/main/java/org/antlr/codegen/CodeGenerator.java
 @@ -1087,7 +1087,7 @@ public class CodeGenerator {
@@ -24,18 +23,6 @@ index 57495b2..eada38e 100644
  
  		// then translate via codegen.g
  		CodeGenTreeWalker gen = new CodeGenTreeWalker(new CommonTreeNodeStream(rewriteTree));
-diff --git a/tool/src/main/java/org/antlr/tool/ErrorManager.java b/tool/src/main/java/org/antlr/tool/ErrorManager.java
-index d3223ae..122c861 100644
---- a/tool/src/main/java/org/antlr/tool/ErrorManager.java
-+++ b/tool/src/main/java/org/antlr/tool/ErrorManager.java
-@@ -385,7 +385,6 @@ public class ErrorManager {
- 			public void runTimeError(STMessage msg) {
- 				switch (msg.error) {
- 				case NO_SUCH_ATTRIBUTE:
--				case NO_SUCH_ATTRIBUTE_PASS_THROUGH:
- 				case NO_SUCH_PROPERTY:
- 					ErrorManager.warning(ErrorManager.MSG_STRING_TEMPLATE_ERROR, msg.toString());
- 					return;
 diff --git a/tool/src/main/java/org/antlr/tool/Grammar.java b/tool/src/main/java/org/antlr/tool/Grammar.java
 index 91bbad9..dc4774a 100644
 --- a/tool/src/main/java/org/antlr/tool/Grammar.java
@@ -72,5 +59,4 @@ index f411090..ddda4ed 100644
          rewrite(g.getTreeAdaptor(),t,g.getTokenNames());
      }
 -- 
-1.9.3
-
+2.7.4

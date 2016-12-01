@@ -1,0 +1,17 @@
+diff -ur antlr3-3.5.2/antlr3-maven-archetype/src/main/resources/archetype-resources/src/main/java/Main.java antlr3-3.5.2new/antlr3-maven-archetype/src/main/resources/archetype-resources/src/main/java/Main.java
+--- antlr3-3.5.2/antlr3-maven-archetype/src/main/resources/archetype-resources/src/main/java/Main.java	2014-03-25 12:47:54.000000000 +0100
++++ antlr3-3.5.2new/antlr3-maven-archetype/src/main/resources/archetype-resources/src/main/java/Main.java	2016-09-26 10:37:14.271208725 +0200
+@@ -38,11 +38,12 @@
+                 {
+                     int s = 0;
+ 
++                    /* remove the dot option for scl package it's not needed
+                     if  (args[0].startsWith("-dot"))
+                     {
+                         makeDot = true;
+                         s = 1;
+-                    }
++                    }*/
+                     // Recursively parse each directory, and each file on the
+                     // command line
+                     //

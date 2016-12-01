@@ -1,42 +1,60 @@
+%{?scl:%scl_package antlr3}
+%{!?scl:%global pkg_name %{name}}
+
 %global antlr_version 3.5.2
 %global c_runtime_version 3.4
 %global javascript_runtime_version 3.1
-%global baserelease 11
+%global baserelease 14
 
-Summary:            ANother Tool for Language Recognition
-Name:               antlr3
-Epoch:              1
-Version:            %{antlr_version}
-Release:            %{baserelease}%{?dist}
-License:            BSD
-URL:                http://www.antlr3.org/
+%{!?_with_bootstrap: %global bootstrap 1}
 
-Source0:            https://github.com/antlr/antlr3/archive/%{antlr_version}.tar.gz
-#Source2:            http://www.antlr3.org/download/Python/antlr_python_runtime-%{python_runtime_version}.tar.gz
-Source3:            http://www.antlr3.org/download/antlr-javascript-runtime-%{javascript_runtime_version}.zip
+Name:           %{?scl_prefix}antlr3
+Epoch:          1
+Version:        %{antlr_version}
+Release:        %{baserelease}%{?dist}
+Summary:        ANother Tool for Language Recognition
+License:        BSD
+URL:            http://www.antlr3.org/
 
-Patch0:             0001-java8-fix.patch
+Source0:        https://github.com/antlr/%{pkg_name}/archive/%{antlr_version}.tar.gz
+#Source2:        http://www.antlr3.org/download/Python/antlr_python_runtime-%{python_runtime_version}.tar.gz
+Source3:        http://www.antlr3.org/download/antlr-javascript-runtime-%{javascript_runtime_version}.zip
+
+%if 0%{?bootstrap}
+# generate with:
+# mock -i antlr3-tool stringtemplate
+# (cd `mock -p` && tar cjf $OLDPWD/antlr3-prebuilt.tar.bz2 usr/share/{maven-metadata,java}/{antlr3,stringtemplate}*)
+Source9999:	antlr3-prebuilt.tar.bz2
+%endif
+
+Patch0:         0001-java8-fix.patch
 # Generate OSGi metadata
 Patch1:         osgi-manifest.patch
+# remove dot option
+Patch2:         remove_dot_option.patch
 
-BuildRequires:  maven-local
-BuildRequires:  mvn(org.antlr:antlr)
-BuildRequires:  mvn(org.antlr:antlr3-maven-plugin)
+BuildRequires:  %{?scl_prefix_maven}maven-local
+BuildRequires:  %{?scl_prefix_maven}maven-plugin-bundle
+BuildRequires:  %{?scl_prefix_maven}maven-plugin-plugin
+BuildRequires:  %{?scl_prefix_maven}maven-project
+BuildRequires:  %{?scl_prefix_maven}plexus-compiler
+BuildRequires:  %{?scl_prefix_maven}sonatype-oss-parent
+
+%if ! 0%{?bootstrap}
 BuildRequires:  mvn(org.antlr:ST4)
 BuildRequires:  mvn(org.antlr:stringtemplate)
-BuildRequires:  mvn(org.apache.felix:maven-bundle-plugin)
-BuildRequires:  mvn(org.apache.maven:maven-plugin-api)
-BuildRequires:  mvn(org.apache.maven:maven-project)
-BuildRequires:  mvn(org.codehaus.plexus:plexus-compiler-api)
-BuildRequires:  mvn(org.sonatype.oss:oss-parent:pom:)
-BuildRequires:  mvn(org.apache.maven.plugins:maven-plugin-plugin)
+BuildRequires:  mvn(org.antlr:antlr)
+BuildRequires:  mvn(org.antlr:antlr3-maven-plugin)
+%endif
 
-BuildRequires:      autoconf
-BuildRequires:      automake
-BuildRequires:      libtool
+BuildRequires:  %{?scl_prefix_maven}xmvn
+BuildRequires:  autoconf
+BuildRequires:  automake
+BuildRequires:  libtool
+%{?scl:Requires: %scl_runtime}
 
 # we don't build it now
-Obsoletes:       antlr3-gunit < 3.2-15
+Obsoletes:      %{pkg_name}-gunit < 3.2-15
 
 %description
 ANother Tool for Language Recognition, is a language tool
@@ -44,15 +62,15 @@ that provides a framework for constructing recognizers,
 interpreters, compilers, and translators from grammatical
 descriptions containing actions in a variety of target languages.
 
-%package     tool
-Summary:     ANother Tool for Language Recognition
-BuildArch:   noarch
-Provides:    %{name} = %{epoch}:%{antlr_version}-%{release}
-Obsoletes:   %{name} < %{epoch}:%{antlr_version}-%{release}
-Requires:    %{name}-java = %{epoch}:%{antlr_version}-%{release}
+%package tool
+Summary:        ANother Tool for Language Recognition
+BuildArch:      noarch
+Provides:       %{pkg_name} = %{epoch}:%{antlr_version}-%{release}
+Obsoletes:      %{pkg_name} < %{epoch}:%{antlr_version}-%{release}
+Requires:       %{pkg_name}-java = %{epoch}:%{antlr_version}-%{release}
 
-Provides:    ant-antlr3 = %{epoch}:%{antlr_version}-%{release}
-Obsoletes:   ant-antlr3 < %{epoch}:%{antlr_version}-%{release}
+Provides:       ant-%{pkg_name} = %{epoch}:%{antlr_version}-%{release}
+Obsoletes:      ant-%{pkg_name} < %{epoch}:%{antlr_version}-%{release}
 
 %description tool
 ANother Tool for Language Recognition, is a language tool
@@ -60,9 +78,9 @@ that provides a framework for constructing recognizers,
 interpreters, compilers, and translators from grammatical
 descriptions containing actions in a variety of target languages.
 
-%package     java
-Summary:     Java run-time support for ANTLR-generated parsers
-BuildArch:   noarch
+%package java
+Summary:        Java run-time support for ANTLR-generated parsers
+BuildArch:      noarch
 
 %description java
 Java run-time support for ANTLR-generated parsers
@@ -74,43 +92,42 @@ BuildArch:      noarch
 %description javadoc
 %{summary}.
 
-%package      javascript
-Summary:      Javascript run-time support for ANTLR-generated parsers
-Version:      %{javascript_runtime_version}
-Release:      %{antlr_version}.%{baserelease}%{?dist}
-BuildArch:    noarch
+%package javascript
+Summary:        Javascript run-time support for ANTLR-generated parsers
+Version:        %{javascript_runtime_version}
+Release:        %{antlr_version}.%{baserelease}%{?dist}
+BuildArch:      noarch
 
 %description  javascript
 Javascript run-time support for ANTLR-generated parsers
 
-%package   C
-Summary:   C run-time support for ANTLR-generated parsers
-Version:   %{c_runtime_version}
-Release:      %{antlr_version}.%{baserelease}%{?dist}
+%package C
+Summary:        C run-time support for ANTLR-generated parsers
+Version:        %{c_runtime_version}
+Release:        %{antlr_version}.%{baserelease}%{?dist}
 
 %description C
 C run-time support for ANTLR-generated parsers
 
-%package   C-devel
-Summary:   Header files for the C bindings for ANTLR-generated parsers
-Requires:  %{name}-C = %{epoch}:%{c_runtime_version}-%{release}
-Version:   %{c_runtime_version}
-Release:      %{antlr_version}.%{baserelease}%{?dist}
-
+%package C-devel
+Summary:        Header files for the C bindings for ANTLR-generated parsers
+Requires:       %{pkg_name}-C = %{epoch}:%{c_runtime_version}-%{release}
+Version:        %{c_runtime_version}
+Release:        %{antlr_version}.%{baserelease}%{?dist}
 
 %description C-devel
 Header files for the C bindings for ANTLR-generated parsers
 
-%package        C-docs
+%package C-docs
 Summary:        API documentation for the C run-time support for ANTLR-generated parsers
 BuildArch:      noarch
 BuildRequires:  graphviz
 BuildRequires:  doxygen
-Requires:       %{name}-C = %{epoch}:%{c_runtime_version}-%{release}
-Version:   %{c_runtime_version}
-Release:      %{antlr_version}.%{baserelease}%{?dist}
+Requires:       %{pkg_name}-C = %{epoch}:%{c_runtime_version}-%{release}
+Version:        %{c_runtime_version}
+Release:        %{antlr_version}.%{baserelease}%{?dist}
 
-%description    C-docs
+%description C-docs
 This package contains doxygen documentation with instruction
 on how to use the C target in ANTLR and complete API description of the
 C run-time support for ANTLR-generated parsers.
@@ -122,16 +139,37 @@ Summary:        C++ runtime support for ANTLR-generated parsers
 C++ runtime support for ANTLR-generated parsers.
 
 %prep
-%setup -q -n antlr3-%{antlr_version} -a 3
+%setup -q -n %{pkg_name}-%{antlr_version} -a 3
 sed -i "s,\${buildNumber},`cat %{_sysconfdir}/fedora-release` `date`," tool/src/main/resources/org/antlr/antlr.properties
 %patch0 -p1
-%patch1
+%patch1 -p1
+# remove dot option for scl package
+%{?scl:%patch2 -p1}
+%{?scl:rm runtime/Java/src/main/java/org/antlr/runtime/tree/DOTTreeGenerator.java}
 
 # remove pre-built artifacts
 find -type f -a -name *.jar -delete
 find -type f -a -name *.class -delete
 
-%pom_disable_module antlr3-maven-archetype
+%if 0%{?bootstrap}
+mkdir bootstrap-repo
+tar xf %{SOURCE9999} -C bootstrap-repo
+sed -i "s:/usr/share/:$PWD/bootstrap-repo&:g" bootstrap-repo/usr/share/maven-metadata/*.xml
+sed -i "/optional/d" bootstrap-repo/usr/share/maven-metadata/*.xml
+mkdir -p .xmvn/config.d
+cat > .xmvn/config.d/bootstrap-config.xml <<EOF
+<configuration>
+<resolverSettings>
+  <metadataRepositories>
+    <repository>$PWD/bootstrap-repo/usr/share/maven-metadata</repository>
+  </metadataRepositories>
+</resolverSettings>
+</configuration>
+EOF
+%endif
+
+%{?scl:scl enable %{scl_maven} %{scl} - << "EOF"}
+%pom_disable_module %{pkg_name}-maven-archetype
 %pom_disable_module gunit
 %pom_disable_module gunit-maven-plugin
 %pom_disable_module antlr-complete
@@ -140,8 +178,8 @@ find -type f -a -name *.class -delete
 %pom_remove_plugin :maven-javadoc-plugin
 
 # compile for target 1.6, see BZ#842572
-sed -i 's/jsr14/1.6/' antlr3-maven-archetype/src/main/resources/archetype-resources/pom.xml \
-                      antlr3-maven-plugin/pom.xml \
+sed -i 's/jsr14/1.6/' %{pkg_name}-maven-archetype/src/main/resources/archetype-resources/pom.xml \
+                      %{pkg_name}-maven-plugin/pom.xml \
                                           gunit/pom.xml \
                                           gunit-maven-plugin/pom.xml \
                                           pom.xml \
@@ -154,11 +192,13 @@ sed -i 's/jsr14/1.6/' antlr3-maven-archetype/src/main/resources/archetype-resour
 %mvn_package :antlr-runtime java
 %mvn_package : tool
 
-%mvn_file :antlr antlr3
-%mvn_file :antlr-runtime antlr3-runtime
-%mvn_file :antlr-maven-plugin antlr3-maven-plugin
+%mvn_file :antlr %{pkg_name}
+%mvn_file :antlr-runtime %{pkg_name}-runtime
+%mvn_file :antlr-maven-plugin %{pkg_name}-maven-plugin
+%{?scl:EOF}
 
 %build
+%{?scl:scl enable %{scl_maven} %{scl} - << "EOF"}
 %mvn_build -f
 
 # Build the C runtime
@@ -178,29 +218,32 @@ doxygen # build doxygen documentation
 popd
 
 # build ant task
-pushd antlr-ant/main/antlr3-task/
+pushd antlr-ant/main/%{pkg_name}-task/
 export CLASSPATH=$(build-classpath ant)
-javac -encoding ISO-8859-1 antlr3-src/org/apache/tools/ant/antlr/ANTLR3.java
-jar cvf ant-antlr3.jar \
-  -C antlr3-src org/apache/tools/ant/antlr/antlib.xml \
-  -C antlr3-src org/apache/tools/ant/antlr/ANTLR3.class
+javac -encoding ISO-8859-1 %{pkg_name}-src/org/apache/tools/ant/antlr/ANTLR3.java
+jar cvf ant-%{pkg_name}.jar \
+  -C %{pkg_name}-src org/apache/tools/ant/antlr/antlib.xml \
+  -C %{pkg_name}-src org/apache/tools/ant/antlr/ANTLR3.class
 popd
+%{?scl:EOF}
 
 %install
 mkdir -p $RPM_BUILD_ROOT/%{_mandir}
 mkdir -p $RPM_BUILD_ROOT/%{_datadir}/antlr
 
+%{?scl:scl enable %{scl_maven} %{scl} - << "EOF"}
 %mvn_install
+%{?scl:EOF}
 
 # install ant task
-install -m 644 antlr-ant/main/antlr3-task/ant-antlr3.jar -D $RPM_BUILD_ROOT%{_javadir}/ant/ant-antlr3.jar
+install -m 644 antlr-ant/main/%{pkg_name}-task/ant-%{pkg_name}.jar -D $RPM_BUILD_ROOT%{_javadir}/ant/ant-%{pkg_name}.jar
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/ant.d
-cat > $RPM_BUILD_ROOT%{_sysconfdir}/ant.d/ant-antlr3 << EOF
-ant/ant-antlr3 antlr3
+cat > $RPM_BUILD_ROOT%{_sysconfdir}/ant.d/ant-%{pkg_name} << EOF
+ant/ant-%{pkg_name} %{pkg_name}
 EOF
 
 # install wrapper script
-%jpackage_script org.antlr.Tool '' '' 'stringtemplate4.jar:antlr3.jar:antlr3-runtime.jar' antlr3 true
+%jpackage_script org.antlr.Tool '' '' 'stringtemplate4/ST4.jar:%{pkg_name}.jar:%{pkg_name}-runtime.jar' %{pkg_name} true
 
 # install C runtime
 pushd runtime/C
@@ -223,7 +266,7 @@ install -pm 644 *.js $RPM_BUILD_ROOT%{_datadir}/antlr/
 popd
 
 # install C++ runtime (header only)
-mkdir -p $RPM_BUILD_ROOT/%{_includedir}/%{name}
+mkdir -p $RPM_BUILD_ROOT/%{_includedir}/%{pkg_name}
 install -pm 644 runtime/Cpp/include/* $RPM_BUILD_ROOT/%{_includedir}/
 
 %post C -p /sbin/ldconfig
@@ -232,9 +275,9 @@ install -pm 644 runtime/Cpp/include/* $RPM_BUILD_ROOT/%{_includedir}/
 
 %files tool -f .mfiles-tool
 %doc README.txt tool/{LICENSE.txt,CHANGES.txt}
-%{_bindir}/antlr3
-%{_javadir}/ant/ant-antlr3.jar
-%config(noreplace) %{_sysconfdir}/ant.d/ant-antlr3
+%{_bindir}/%{pkg_name}
+%{_javadir}/ant/ant-%{pkg_name}.jar
+%config(noreplace) %{_sysconfdir}/ant.d/ant-%{pkg_name}
 
 %files C
 %doc tool/LICENSE.txt
@@ -263,6 +306,15 @@ install -pm 644 runtime/Cpp/include/* $RPM_BUILD_ROOT/%{_includedir}/
 %doc tool/LICENSE.txt
 
 %changelog
+* Mon Nov 28 2016 Tomas Repik <trepik@redhat.com> - 1:3.5.2-14
+- scl conversion
+
+* Tue Oct 04 2016 David Geiger <daviddavid> - 1:3.5.2-13
+- Fix stringtemplate4 jar classpath in shell script (stringtemplate4/ST4.jar)
+
+* Tue Sep 27 2016 Michael Simacek <msimacek@redhat.com> - 1:3.5.2-12
+- Fix Java 8 patch
+
 * Wed Jun 15 2016 Mikolaj Izdebski <mizdebsk@redhat.com> - 1:3.5.2-11
 - Regenerate build-requires
 

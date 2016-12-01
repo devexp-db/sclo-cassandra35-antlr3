@@ -1,0 +1,73 @@
+diff --git a/antlr3.spec b/antlr3.spec
+index 6051f88..e148e2a 100644
+--- a/antlr3.spec
++++ b/antlr3.spec
+@@ -3,6 +3,8 @@
+ %global javascript_runtime_version 3.1
+ %global baserelease 13
+ 
++%{!?_with_bootstrap: %global bootstrap 1}
++
+ Summary:            ANother Tool for Language Recognition
+ Name:               antlr3
+ Epoch:              1
+@@ -15,21 +17,31 @@ Source0:            https://github.com/antlr/antlr3/archive/%{antlr_version}.tar
+ #Source2:            http://www.antlr3.org/download/Python/antlr_python_runtime-%{python_runtime_version}.tar.gz
+ Source3:            http://www.antlr3.org/download/antlr-javascript-runtime-%{javascript_runtime_version}.zip
+ 
++%if 0%{?bootstrap}
++# generate with:
++# mock -i antlr3-tool stringtemplate
++# (cd `mock -p` && tar cjf $OLDPWD/antlr3-prebuilt.tar.bz2 usr/share/{maven-metadata,java}/{antlr3,stringtemplate}*)
++Source9999:         antlr3-prebuilt.tar.bz2
++%endif
++
+ Patch0:             0001-java8-fix.patch
+ # Generate OSGi metadata
+ Patch1:         osgi-manifest.patch
+ 
+ BuildRequires:  maven-local
+-BuildRequires:  mvn(org.antlr:antlr)
+-BuildRequires:  mvn(org.antlr:antlr3-maven-plugin)
+-BuildRequires:  mvn(org.antlr:ST4)
+-BuildRequires:  mvn(org.antlr:stringtemplate)
+ BuildRequires:  mvn(org.apache.felix:maven-bundle-plugin)
+ BuildRequires:  mvn(org.apache.maven:maven-plugin-api)
++BuildRequires:  mvn(org.apache.maven.plugins:maven-plugin-plugin)
+ BuildRequires:  mvn(org.apache.maven:maven-project)
+ BuildRequires:  mvn(org.codehaus.plexus:plexus-compiler-api)
+ BuildRequires:  mvn(org.sonatype.oss:oss-parent:pom:)
+-BuildRequires:  mvn(org.apache.maven.plugins:maven-plugin-plugin)
++
++%if ! 0%{?bootstrap}
++BuildRequires:  mvn(org.antlr:ST4)
++BuildRequires:  mvn(org.antlr:stringtemplate)
++BuildRequires:  mvn(org.antlr:antlr)
++BuildRequires:  mvn(org.antlr:antlr3-maven-plugin)
++%endif
+ 
+ BuildRequires:      autoconf
+ BuildRequires:      automake
+@@ -139,6 +151,22 @@ find -type f -a -name *.class -delete
+ %pom_remove_plugin :maven-source-plugin
+ %pom_remove_plugin :maven-javadoc-plugin
+ 
++%if 0%{?bootstrap}
++mkdir bootstrap-repo
++tar xf %{SOURCE9999} -C bootstrap-repo
++sed -i "s:/usr/share/:$PWD/bootstrap-repo&:g" bootstrap-repo/usr/share/maven-metadata/*.xml
++mkdir -p .xmvn/config.d
++cat > .xmvn/config.d/bootstrap-config.xml <<EOF
++<configuration>
++<resolverSettings>
++  <metadataRepositories>
++    <repository>$PWD/bootstrap-repo/usr/share/maven-metadata</repository>
++  </metadataRepositories>
++</resolverSettings>
++</configuration>
++EOF
++%endif
++
+ # compile for target 1.6, see BZ#842572
+ sed -i 's/jsr14/1.6/' antlr3-maven-archetype/src/main/resources/archetype-resources/pom.xml \
+                       antlr3-maven-plugin/pom.xml \
