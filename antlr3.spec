@@ -22,9 +22,9 @@ Source3:        http://www.antlr3.org/download/antlr-javascript-runtime-%{javasc
 
 %if 0%{?bootstrap}
 # generate with:
-# mock -i antlr3-tool stringtemplate
-# (cd `mock -p` && tar cjf $OLDPWD/antlr3-prebuilt.tar.bz2 usr/share/{maven-metadata,java}/{antlr3,stringtemplate}*)
-Source9999:	antlr3-prebuilt.tar.bz2
+# mock -i antlr3-tool stringtemplate4
+# (cd `mock -p` && tar cjf $OLDPWD/antlr3-prebuilt.tar.bz2 usr/share/{maven-metadata,java}/{antlr3,stringtemplate4}*)
+Source9999:	%{pkg_name}-prebuilt.tar.bz2
 %endif
 
 Patch0:         0001-java8-fix.patch
@@ -39,12 +39,12 @@ BuildRequires:  %{?scl_prefix_maven}maven-plugin-plugin
 BuildRequires:  %{?scl_prefix_maven}maven-project
 BuildRequires:  %{?scl_prefix_maven}plexus-compiler
 BuildRequires:  %{?scl_prefix_maven}sonatype-oss-parent
+BuildRequires:  %{?scl_prefix}stringtemplate
 
 %if ! 0%{?bootstrap}
-BuildRequires:  mvn(org.antlr:ST4)
-BuildRequires:  mvn(org.antlr:stringtemplate)
-BuildRequires:  mvn(org.antlr:antlr)
-BuildRequires:  mvn(org.antlr:antlr3-maven-plugin)
+BuildRequires:  %{?scl_prefix}stringtemplate4
+BuildRequires:  %{?scl_prefix}%{pkg_name}-tool
+BuildRequires:  %{?scl_prefix}%{pkg_name}-java
 %endif
 
 BuildRequires:  %{?scl_prefix_maven}xmvn
@@ -67,7 +67,7 @@ Summary:        ANother Tool for Language Recognition
 BuildArch:      noarch
 Provides:       %{pkg_name} = %{epoch}:%{antlr_version}-%{release}
 Obsoletes:      %{pkg_name} < %{epoch}:%{antlr_version}-%{release}
-Requires:       %{pkg_name}-java = %{epoch}:%{antlr_version}-%{release}
+Requires:       %{?scl_prefix}%{pkg_name}-java = %{epoch}:%{antlr_version}-%{release}
 
 Provides:       ant-%{pkg_name} = %{epoch}:%{antlr_version}-%{release}
 Obsoletes:      ant-%{pkg_name} < %{epoch}:%{antlr_version}-%{release}
