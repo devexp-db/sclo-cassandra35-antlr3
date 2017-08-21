@@ -111,7 +111,7 @@ C run-time support for ANTLR-generated parsers
 
 %package C-devel
 Summary:        Header files for the C bindings for ANTLR-generated parsers
-Requires:       %{pkg_name}-C = %{epoch}:%{c_runtime_version}-%{release}
+Requires:       %{?scl_prefix}%{pkg_name}-C = %{epoch}:%{c_runtime_version}-%{release}
 Version:        %{c_runtime_version}
 Release:        %{antlr_version}.%{baserelease}%{?dist}
 
@@ -123,7 +123,7 @@ Summary:        API documentation for the C run-time support for ANTLR-generated
 BuildArch:      noarch
 BuildRequires:  graphviz
 BuildRequires:  doxygen
-Requires:       %{pkg_name}-C = %{epoch}:%{c_runtime_version}-%{release}
+Requires:       %{?scl_prefix}%{pkg_name}-C = %{epoch}:%{c_runtime_version}-%{release}
 Version:        %{c_runtime_version}
 Release:        %{antlr_version}.%{baserelease}%{?dist}
 
